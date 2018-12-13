@@ -15,17 +15,15 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Redis的配置
-    REDIS_PORT = 6739
-    REDIS_HOST = 'localhost'
+    REDIS_PORT = 6379
+    REDIS_HOST = '127.0.0.1'
 
     """安全配置"""
-    # CSRF安全配置
-    # CSRFProtect
-
     # session的配置
-    SESSION_TYPE = 'redis'  # 配置会话为redis
-    SESSION_USE_SIGNER = True  # 设置加上安全秘钥
-    SESSION_REDIS = redis.StrictRedis(port=REDIS_PORT, host=REDIS_HOST)  # 设置为redis对象
+    SESSION_TYPE = 'redis'  # 指定session保存到redis中
+    SESSION_USE_SIGNER = True  # 让cookie中的session_id被加密处理
+    # SESSION_REDIS = redis.StrictRedis(port=REDIS_PORT, host=REDIS_HOST)  # 设置为redis实例
+    SESSION_REDIS = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)  # 使用 redis 的实例
     PERMANM_SESSION_LIFETIME = 86400  # 设置有效期，单位是秒
 
 
