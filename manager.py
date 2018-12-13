@@ -1,3 +1,5 @@
+import logging
+
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
@@ -19,4 +21,9 @@ def index():
 
 
 if __name__ == '__main__':
+    # logging.debug("debug")
+    # logging.info("info")
+    # logging.warning("warning")
+    # logging.error('EOROR')
+    # logging.critical('critical')
     app.run(debug=True)

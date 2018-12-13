@@ -1,3 +1,4 @@
+import logging
 import os
 import redis
 from base64 import b64encode
@@ -26,6 +27,10 @@ class Config(object):
     SESSION_REDIS = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)  # 使用 redis 的实例
     PERMANM_SESSION_LIFETIME = 86400  # 设置有效期，单位是秒
 
+    """日志相关的配置"""
+    # 日志的级别
+    LOG_LEVEL = logging.DEBUG
+
 
 class DvelopMentConfig(Config):
     """开发环境配置"""
@@ -34,7 +39,7 @@ class DvelopMentConfig(Config):
 
 class ProductionConfig(Config):
     """生产环境配置"""
-    pass
+    LOG_LEVEL = logging.ERROR
 
 
 class TestingConfig(Config):
