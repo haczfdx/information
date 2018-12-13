@@ -27,9 +27,9 @@ class Config(object):
     PERMANM_SESSION_LIFETIME = 86400  # 设置有效期，单位是秒
 
 
-class DvelopentConfig(Config):
+class DvelopMentConfig(Config):
     """开发环境配置"""
-    pass
+    DEBUG = True
 
 
 class ProductionConfig(Config):
@@ -40,3 +40,11 @@ class ProductionConfig(Config):
 class TestingConfig(Config):
     """测试环境配置"""
     pass
+
+
+config = {
+    'development': DvelopMentConfig,
+    'production': ProductionConfig,
+    'test': TestingConfig
+
+}
