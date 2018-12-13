@@ -34,6 +34,11 @@ def create_app(config_name):
     # # 设置Session保存的位置
     Session(app)
 
+    # 进行蓝图的注册
+    from info.moduels.index import index
+
+    app.register_blueprint(index)
+
     return app
 
 

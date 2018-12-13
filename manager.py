@@ -1,5 +1,3 @@
-import logging
-
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
@@ -14,16 +12,6 @@ manager = Manager(app)
 Migrate(db, app)
 manager.add_command('db', MigrateCommand)
 
-
-@app.route("/")
-def index():
-    return "hello world"
-
-
 if __name__ == '__main__':
-    # logging.debug("debug")
-    # logging.info("info")
-    # logging.warning("warning")
-    # logging.error('EOROR')
-    # logging.critical('critical')
+    print(app.url_map)
     app.run(debug=True)
