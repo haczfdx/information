@@ -1,18 +1,16 @@
-from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
-
+from flask_migrate import Migrate, MigrateCommand
 from info import create_app, db
-from info import  models
+from info import models
 
-app = create_app('test')
+app = create_app('development')
 
-# 进行脚本化
+# 添加扩展命令行
 manager = Manager(app)
 
-# 设置数据库迁移
-Migrate(db, app)
+# 数据库迁移
+Migrate(app, db)
 manager.add_command('db', MigrateCommand)
 
 if __name__ == '__main__':
-    print(app.url_map)
-    app.run(debug=True)
+    manager.run()
