@@ -54,12 +54,23 @@ def send_sms_code():
 
     # 生成一个6位数的随机数
     authcode = "%06d" % random.randint(0, 999999)
-    print(authcode)
-    ccp = CCP()
-    # 注意： 测试的短信模板编号为1
-    ccp.send_template_sms(mobile, [authcode, int(constants.SMS_CODE_REDIS_EXPIRES/60)], 1)
-    # 3、先从redis中取出真实的验证码
-    # 4、进行验证码的校对
+    print("验证码是：", authcode)
+    current_app.logger.debug("验证码是：", authcode)
+
+    # 下面实现验证码的功能，这里已经测试成功就暂时不给手机发送，直接打印出验证码
+    # result = CCP().send_template_sms(mobile, [authcode, int(constants.SMS_CODE_REDIS_EXPIRES / 60)], 1)
+    # if result:
+    #     current_app.logger.error("手机验证发送出错")
+    #     return jsonify(errno=RET.THIRDERR, errmsg="手机验证码发送失败")
+
+    # 将发送的随机验证填写到redis数据库中，key为sms_手机号，value值为验证码
+    try:
+        redis_store.set("sms_"+mobile, authcode, constants.SMS_CODE_REDIS_EXPIRES)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="手机验证码数据保存失败")
+
+    # 所有的都OK了，发送验证码
     return jsonify(errno=RET.OK, errmsg="发送成功")
 
 
@@ -79,7 +90,7 @@ def get_image_code():
 
     # 通过api接口获取验证的内容和image的文件      
     name, text, image = captcha.generate_captcha()
-    current_app.logger.error("验证码是：" + text)
+    current_app.logger.debug("验证码是：" + text)
 
     # 将验证的内容写入redis的数据库，缓存时间为300秒
     # print(type(image_code_id))
