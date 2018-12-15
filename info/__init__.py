@@ -9,6 +9,9 @@ from config import config
 
 db = SQLAlchemy()
 
+# 初始化redis对象
+redis_store = None
+
 
 def create_app(config_name):
     """工厂模式抽出业务逻辑配置"""
@@ -26,10 +29,11 @@ def create_app(config_name):
     db.init_app(app)
 
     # 配置redis数据库
-    redis_conn = redis.StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT)
+    global redis_store  # 使用全局redis
+    redis_store = redis.StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT, decode_responses=True)
 
     # 开启CSRF保护
-    CSRFProtect(app)
+    # CSRFProtect(app)
     #
     # # 设置Session保存的位置
     Session(app)
@@ -37,7 +41,10 @@ def create_app(config_name):
     # 进行蓝图的注册
     from info.moduels.index import index_blue
 
-    app.register_blueprint(index_blue)
+    app.register_blueprint(index_blue, url_prefix="/")
+    from info.moduels.passport import passport_blue
+
+    app.register_blueprint(passport_blue, url_prefix="/passport")
 
     return app
 

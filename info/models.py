@@ -92,6 +92,7 @@ class User(BaseModel, db.Model):
         }
         return resp_dict
 
+
 class News(BaseModel, db.Model):
     """新闻"""
     __tablename__ = "info_news"
@@ -148,6 +149,7 @@ class News(BaseModel, db.Model):
         }
         return resp_dict
 
+
 class Comment(BaseModel, db.Model):
     """评论"""
     __tablename__ = "info_comment"
@@ -171,6 +173,7 @@ class Comment(BaseModel, db.Model):
             "like_count": self.like_count
         }
         return resp_dict
+
 
 class CommentLike(BaseModel, db.Model):
     """评论点赞"""

@@ -150,15 +150,21 @@ $(function(){
 
 var imageCodeId = ""
 
-// TODO 生成一个图片验证码的编号，并设置页面中图片验证码img标签的src属性
+// 生成一个图片验证码的编号，并设置页面中图片验证码img标签的src属性
 function generateImageCode() {
+    // 浏览器要发送的请求/image_code?imageCodeId
+    imageCodeId = generateUUID()
+    // 生成url
+    var url = "/passport/image_code?imageCodeId="+ imageCodeId
+
+    $(".get_pic_code").attr("src", url)
 
 }
 
 // 发送短信验证码
 function sendSMSCode() {
     // 校验参数，保证输入框有数据填写
-    $(".get_code").removeAttr("onclick");
+    // $(".get_code").removeAttr("onclick");
     var mobile = $("#register_mobile").val();
     if (!mobile) {
         $("#register-mobile-err").html("请填写正确的手机号！");
@@ -175,6 +181,25 @@ function sendSMSCode() {
     }
 
     // TODO 发送短信验证码
+    // 初始化数据
+    formData = {
+        "mobile": mobile,
+        "imageCode":imageCode,
+        "image_code_id": imageCodeId
+    }
+
+    $.ajax({
+        url: '/passport/sms_code',
+        type: "post",
+        // dataType: "json",
+        data: JSON.stringify(formData),
+        contentType:'application/json',
+    }).done(function (dat) {
+        alert(dat.errmsg)
+    }).fail(function (dat) {
+        alert(dat.errmsg)
+    })
+
 }
 
 // 调用该函数模拟点击左侧按钮
