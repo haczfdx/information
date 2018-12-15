@@ -35,9 +35,9 @@ def create_app(config_name):
     Session(app)
 
     # 进行蓝图的注册
-    from info.moduels.index import index
+    from info.moduels.index import index_blue
 
-    app.register_blueprint(index)
+    app.register_blueprint(index_blue)
 
     return app
 
