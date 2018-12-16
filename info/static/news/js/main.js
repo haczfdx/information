@@ -18,7 +18,7 @@ $(function(){
         $("#login-password-err").hide();
     });
 
-    $(".register_form #mobile").focus(function(){
+    $(".register_form #register_mobile").focus(function(){
         $("#register-mobile-err").hide();
     });
     $(".register_form #imagecode").focus(function(){
@@ -164,7 +164,7 @@ function generateImageCode() {
 // 发送短信验证码
 function sendSMSCode() {
     // 校验参数，保证输入框有数据填写
-    // $(".get_code").removeAttr("onclick");
+    $(".get_code").removeAttr("onclick");
     var mobile = $("#register_mobile").val();
     if (!mobile) {
         $("#register-mobile-err").html("请填写正确的手机号！");
@@ -174,8 +174,8 @@ function sendSMSCode() {
     }
     var imageCode = $("#imagecode").val();
     if (!imageCode) {
-        $("#image-code-err").html("请填写验证码！");
-        $("#image-code-err").show();
+        $("#register-image-code-err").html("请填写验证码！");
+        $("#register-image-code-err").show();
         $(".get_code").attr("onclick", "sendSMSCode();");
         return;
     }
@@ -194,11 +194,40 @@ function sendSMSCode() {
         // dataType: "json",
         data: JSON.stringify(formData),
         contentType:'application/json',
-    }).done(function (dat) {
-        alert(dat.errmsg)
-    }).fail(function (dat) {
-        alert(dat.errmsg)
+        success:function (response) {
+            if (response.errno==0){
+                // 发送成功显示出发送成功
+                $("#register-sms-code-err").html("发送成功").show()
+                // 设置倒计时
+                num = 60
+                $(".get_code").html(num)
+                timmer = setInterval(function () {
+                    num --
+                    $(".get_code").html(num)
+                    if (num<1){
+                        // alert(num)
+                        clearInterval(timmer)
+                        $(".get_code").html("点击获取验证码")
+                        $(".get_code").attr("onclick","sendSMSCode()");
+                    }
+                },1000)
+
+            }else{
+                alert(response.errmsg)
+
+             $(".get_code").attr("onclick","sendSMSCode()");
+            }
+
+        }
+
     })
+
+
+    // done(function (dat) {
+    //     alert(dat.errmsg + "scuess")
+    // }).fail(function (dat) {
+    //     alert(dat.errmsg + "failed")
+    // })
 
 }
 

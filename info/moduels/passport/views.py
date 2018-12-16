@@ -18,6 +18,9 @@ def send_sms_code():
     一致的话，生成验证码的内容，发送过去
     :return:
     """
+    # 做测试的时候使用
+    # return jsonify(errno=RET.OK, errmsg="发送成功")
+
     # 1、将参数提取出来
     # params_dict = json.loads(request.data)
     params_dict = request.json
@@ -37,9 +40,9 @@ def send_sms_code():
 
     # 通过image_code_id 取出数据验证码与填写的验证码进行匹配
     try:
-        print("imageCode_" + image_code_id)
+        # print("imageCode_" + image_code_id)
         redis_image_code = redis_store.get("imageCodeId_" + image_code_id)
-        print(redis_image_code)
+        print("验证码：", redis_image_code)
     except Exception as e:
         current_app.logger.error(e)
         # return jsonify(errno=RET.PARAMERR, errmsg="请输入正确的电话号码")
@@ -49,15 +52,15 @@ def send_sms_code():
     if not redis_image_code:
         return jsonify(errno=RET.NODATA, errmsg="验证码已经过期")
 
-    if redis_image_code != image_code:
+    if redis_image_code.upper() != image_code.upper():
         return jsonify(errno=RET.DATAERR, errmsg="验证码输入错误")
 
     # 生成一个6位数的随机数
     authcode = "%06d" % random.randint(0, 999999)
-    print("验证码是：", authcode)
-    current_app.logger.debug("验证码是：", authcode)
+    print("手机验证码是：", authcode)
+    current_app.logger.debug("验证码是：" + str(authcode))
 
-    # 下面实现验证码的功能，这里已经测试成功就暂时不给手机发送，直接打印出验证码
+    # # 下面实现验证码的功能，这里已经测试成功就暂时不给手机发送，直接打印出验证码
     # result = CCP().send_template_sms(mobile, [authcode, int(constants.SMS_CODE_REDIS_EXPIRES / 60)], 1)
     # if result:
     #     current_app.logger.error("手机验证发送出错")
