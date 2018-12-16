@@ -114,6 +114,27 @@ $(function(){
         }
 
         // 发起登录请求
+        param = {
+            'mobile':mobile,
+            'password':password,
+        }
+        $.ajax({
+            url: "/passport/login",
+            type:"post",
+            data: JSON.stringify(param),
+            contentType: "application/json",
+            success: function (response) {
+                     if (response.errno == 0){
+                    // 代表登录成功
+                    location.reload()
+                }
+                else {
+                    // 登录失败
+                        alert(response.errmsg)
+                }
+
+            }
+        })
     })
 
 
@@ -297,4 +318,11 @@ function generateUUID() {
         return (c=='x' ? r : (r&0x3|0x8)).toString(16);
     });
     return uuid;
+}
+
+function logout() {
+    $.get("/passport/logout", function (resp) {
+        location.reload()
+
+    })
 }

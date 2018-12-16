@@ -14,6 +14,7 @@ class Config(object):
     # MySQL数据库配置
     SQLALCHEMY_DATABASE_URI = "mysql://root:root@localhost:3306/information"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # SQLALCHEMY_COMMIT_ON_TEARDOWN = True  # 可以配置自动Commit
 
     # Redis的配置
     REDIS_PORT = 6379

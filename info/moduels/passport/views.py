@@ -7,8 +7,58 @@ from info.models import User
 from info.utils.response_code import RET
 from . import passport_blue
 from info import redis_store, constants, db
-from flask import request, abort, make_response, current_app, jsonify, session
+from flask import request, abort, make_response, current_app, jsonify, session, redirect, url_for
 from info.utils.captcha.captcha import captcha
+
+
+@passport_blue.route("/logout")
+def logout():
+    session.pop("mobile", None)
+    session.pop("nick_name", None)
+    session.pop("user_id", None)
+    return jsonify(errno=RET.PARAMERR, errmsg="退出成功")
+
+
+@passport_blue.route("/login", methods=["POST"])
+def login():
+    """登录的ajax接口"""
+
+    # 第一步老规矩解析post数据
+    mobile = request.json.get("mobile")
+    password = request.json.get("password")
+    # 判断所有的值是否有空值，如果有空直接return走
+    if not all([mobile, password]):
+        return jsonify(errno=RET.PARAMERR, errmsg="参数发生错误")
+
+    # 对手机号进行正则匹配，不符合要求直接返回
+    if not re.match(r"^1[345678]\d{9}$", mobile):
+        return jsonify(errno=RET.PARAMERR, errmsg="请输入正确的电话号码")
+
+    # 开始进入数据库拉数据进行匹配
+    user = User.query.filter(User.mobile == mobile).first()
+    if not user:
+        # 用户名输入错误
+        return jsonify(errno=RET.LOGINERR, errmsg="请输入正确的用户名")
+
+    if not user.check_passoword(password):
+        return jsonify(errno=RET.OK, errmsg="密码错误")
+
+    # 已经验证成功用户名和密码了，开始修改最后一次的登录的时候
+
+    user.last_login = datetime.now()
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="不知道为啥登录时间出错了")
+
+    # 登录成功先设置会话的session
+    session["user_id"] = user.id
+    session["moblie"] = user.mobile
+    session["nick_name"] = user.nick_name
+
+    return jsonify(errno=RET.OK, errmsg="OK")
 
 
 @passport_blue.route("/register", methods=["POST"])
@@ -51,7 +101,7 @@ def register():
     user = User()
     user.mobile = mobile  # 用户的手机
     user.nick_name = mobile  # 用户的昵称，可以使用手机先代替
-    user.password = password # 用户的密码
+    user.password = password  # 用户的密码
     user.last_login = datetime.now()  # 先初始化登录时间
     try:
         db.session.add(user)
