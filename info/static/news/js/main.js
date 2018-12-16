@@ -3,6 +3,7 @@ $(function(){
 	// 打开登录框
 	$('.login_btn').click(function(){
         $('.login_form_con').show();
+        return false
 	})
 	
 	// 点击关闭按钮关闭登录框或者注册框
@@ -27,7 +28,7 @@ $(function(){
     $(".register_form #smscode").focus(function(){
         $("#register-sms-code-err").hide();
     });
-    $(".register_form #password").focus(function(){
+    $(".register_form #register_password").focus(function(){
         $("#register-password-err").hide();
     });
 
@@ -52,6 +53,7 @@ $(function(){
 	$('.register_btn').click(function(){
 		$('.register_form_con').show();
 		generateImageCode()
+        return false
 	})
 
 
@@ -60,12 +62,14 @@ $(function(){
 		$('.login_form_con').hide();
 		$('.register_form_con').show();
         generateImageCode()
+         return false
 	})
 
 	// 登录框和注册框切换
 	$('.to_login').click(function(){
 		$('.login_form_con').show();
 		$('.register_form_con').hide();
+		 return false
 	})
 
 	// 根据地址栏的hash值来显示用户中心对应的菜单
@@ -124,10 +128,13 @@ $(function(){
         var password = $("#register_password").val()
 
 		if (!mobile) {
+
+
             $("#register-mobile-err").show();
             return;
         }
         if (!smscode) {
+            $("#register-sms-code-err").html("验证码不能为空");
             $("#register-sms-code-err").show();
             return;
         }
@@ -137,13 +144,39 @@ $(function(){
             return;
         }
 
-		if (password.length < 6) {
-            $("#register-password-err").html("密码长度不能少于6位");
-            $("#register-password-err").show();
-            return;
-        }
+        // 对密码长度的判断
+		// if (password.length < 6) {
+        //     $("#register-password-err").html("密码长度不能少于6位");
+        //     $("#register-password-err").show();
+        //     return;
+        // }
 
         // 发起注册请求
+        param = {
+		    'mobile': mobile,
+            'smscode': smscode,
+            'password': password
+        }
+
+        $.ajax({
+            url: "/passport/register",
+
+            type: "POST",
+            // dataType: "json",
+            contentType:'application/json',
+            data:JSON.stringify(param),
+            success:function (response) {
+                if (response.errno == 0){
+                    // 代表注册成功
+                    location.reload()
+                }
+                else {
+                    // 注册失败
+                        alert(response.errmsg)
+                }
+
+            }
+        })
 
     })
 })
@@ -199,7 +232,7 @@ function sendSMSCode() {
                 // 发送成功显示出发送成功
                 $("#register-sms-code-err").html("发送成功").show()
                 // 设置倒计时
-                num = 60
+                num = 3
                 $(".get_code").html(num)
                 timmer = setInterval(function () {
                     num --

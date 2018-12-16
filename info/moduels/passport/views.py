@@ -1,12 +1,72 @@
 import random
 import re
+from datetime import datetime
 
 from info.libs.yuntongxun.sms import CCP
+from info.models import User
 from info.utils.response_code import RET
 from . import passport_blue
-from info import redis_store, constants
-from flask import request, abort, make_response, current_app, jsonify
+from info import redis_store, constants, db
+from flask import request, abort, make_response, current_app, jsonify, session
 from info.utils.captcha.captcha import captcha
+
+
+@passport_blue.route("/register", methods=["POST"])
+def register():
+    """实现用户在注册按钮点击之后实现的接口"""
+    print(request.json)
+
+    # 先表单数据传送过来的所有的值
+    mobile = request.json.get("mobile")
+    smscode = request.json.get("smscode")
+    password = request.json.get("password")
+
+    # 判断所有的值是否有空值，如果有空直接return走
+    if not all([mobile, smscode, password]):
+        return jsonify(errno=RET.PARAMERR, errmsg="参数发生错误")
+
+    # 对手机号进行正则匹配，不符合要求直接返回
+    if not re.match(r"^1[345678]\d{9}$", mobile):
+        return jsonify(errno=RET.PARAMERR, errmsg="请输入正确的电话号码")
+
+    # 通过手机号码去redis中取出对应的数据进行判断
+    try:
+        redis_sms_code = redis_store.get("sms_" + mobile)
+        print("手机验证码为：", redis_sms_code)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(error=RET.DBERR, errmsg="这个手机号码没有发送验证码")
+
+    # 很重要的一步，进行手机验证码的校验
+    if not redis_sms_code:
+        return jsonify(error=RET.DATAERR, errmsg="验证码已经过期了")
+    if redis_sms_code != smscode:
+        return jsonify(error=RET.DATAERR, errmsg="手机验证码是咋了，匹配不正确")
+
+    # 对密码的位数进行匹配，暂时的要求至少得有6位
+    if len(password) < 6:
+        return jsonify(errno=RET.PARAMERR, errmsg="密码至少要输入6位以上")
+
+    # 能走到这步很明显成功满足所有的条件了，下面进行mysql添加用户的功能
+    user = User()
+    user.mobile = mobile  # 用户的手机
+    user.nick_name = mobile  # 用户的昵称，可以使用手机先代替
+    user.password = password # 用户的密码
+    user.last_login = datetime.now()  # 先初始化登录时间
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="用户名已经被注册")
+
+    # 终于走到这里了，注册成功将注册写入会话session
+    session["user_id"] = user.id
+    session["moblie"] = mobile
+    session["nick_name"] = user.nick_name
+
+    return jsonify(errno=RET.OK, errmsg="OK")
 
 
 @passport_blue.route("/sms_code", methods=["POST"])
@@ -68,7 +128,7 @@ def send_sms_code():
 
     # 将发送的随机验证填写到redis数据库中，key为sms_手机号，value值为验证码
     try:
-        redis_store.set("sms_"+mobile, authcode, constants.SMS_CODE_REDIS_EXPIRES)
+        redis_store.set("sms_" + mobile, authcode, constants.SMS_CODE_REDIS_EXPIRES)
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="手机验证码数据保存失败")
