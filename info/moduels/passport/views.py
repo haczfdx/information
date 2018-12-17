@@ -35,7 +35,12 @@ def login():
         return jsonify(errno=RET.PARAMERR, errmsg="请输入正确的电话号码")
 
     # 开始进入数据库拉数据进行匹配
-    user = User.query.filter(User.mobile == mobile).first()
+    try:
+        user = User.query.filter(User.mobile == mobile).first()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="数据库链接出错")
+
     if not user:
         # 用户名输入错误
         return jsonify(errno=RET.LOGINERR, errmsg="请输入正确的用户名")

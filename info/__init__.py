@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 from config import config
 
+
 db = SQLAlchemy()
 
 # 初始化redis对象
@@ -37,6 +38,10 @@ def create_app(config_name):
     #
     # # 设置Session保存的位置
     Session(app)
+
+    # 给app添加自定义过滤器
+    from info.utils.common import rank_class
+    app.add_template_filter(rank_class)
 
     # 进行蓝图的注册
     from info.moduels.index import index_blue
