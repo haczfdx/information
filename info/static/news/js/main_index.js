@@ -44,7 +44,7 @@ $(function(){
         $("#register-password-err").hide();
     });
 
-	// 点击输入框，提示文字上移
+  // 点击输入框，提示文字上移
 	$('.form_group').on('click focusin',function(){
 		$(this).children('.input_tip').animate({'top':-5,'font-size':12},'fast').siblings('input').focus().parent().addClass('hotline');
 	})
@@ -58,7 +58,6 @@ $(function(){
 			$(this).siblings('.input_tip').animate({'top':22,'font-size':14},'fast');
 		}
 	})
-
 
 
 	// 登录框和注册框切换

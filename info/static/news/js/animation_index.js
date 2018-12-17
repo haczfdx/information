@@ -11,6 +11,9 @@ $(function () {
         $(".login_form_con").hide()
         $(".register_form_con").hide()
 })
+
+
+
     // 注册表单上的一下动画加强
 
 })
