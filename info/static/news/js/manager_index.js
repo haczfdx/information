@@ -167,10 +167,10 @@ function sendSMSCode() {
                 $("#register-sms-code-err").html("发送成功").show()
                 // 设置倒计时
                 num = 3
-                $(".get_code").html(num)
+                $(".get_code").html(num+" 秒")
                 timmer = setInterval(function () {
                     num --
-                    $(".get_code").html(num)
+                    $(".get_code").html(num+" 秒")
                     if (num<1){
                         // alert(num)
                         clearInterval(timmer)
@@ -180,6 +180,10 @@ function sendSMSCode() {
                 },1000)
 
             }else{
+                alert(response.errmsg)
+                // if (response.errno ==4004 ){
+                //
+                // }
                 alert(response.errmsg)
 
              $(".get_code").attr("onclick","sendSMSCode()");

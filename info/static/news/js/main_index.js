@@ -1,9 +1,23 @@
 $(function(){
 	// 打开登录框
 	$('.login_btn').click(function(){
+		$("#mobile").val("")
+		$("#password").val("")
         $('.login_form_con').show();
         return false
 	})
+
+	// 打开注册框
+	$('.register_btn').click(function(){
+		$("#register_mobile").val("")
+		$("#imagecode").val("")
+		$("#smscode").val("")
+		$("#register_password").val("")
+		$('.register_form_con').show();
+		generateImageCode()
+        return false
+	})
+
 
 	// 点击关闭按钮关闭登录框或者注册框
 	$('.shutoff').click(function(){
@@ -45,12 +59,7 @@ $(function(){
 		}
 	})
 
-	// 打开注册框
-	$('.register_btn').click(function(){
-		$('.register_form_con').show();
-		generateImageCode()
-        return false
-	})
+
 
 	// 登录框和注册框切换
 	$('.to_register').click(function(){

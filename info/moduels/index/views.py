@@ -28,6 +28,8 @@ def index():
             news_list.append(news_info.title)
         # print(news_list)
 
+    # 获取当前已经点击的栏目
+
     # 定义一个data字典存放数据
     data = {
         'user_dict': user_dict,
