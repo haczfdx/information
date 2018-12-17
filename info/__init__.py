@@ -59,12 +59,17 @@ def create_app(config_name):
     app.add_template_filter(rank_class)
 
     # 进行蓝图的注册
+    #  主页模板的路由注册
     from info.moduels.index import index_blue
-
     app.register_blueprint(index_blue, url_prefix="/")
-    from info.moduels.passport import passport_blue
 
+    # 登录相关的路由注册
+    from info.moduels.passport import passport_blue
     app.register_blueprint(passport_blue, url_prefix="/passport")
+
+    # 新闻相关的路由注册
+    from info.moduels.news import news_blue
+    app.register_blueprint(news_blue, url_prefix="/news")
 
     return app
 

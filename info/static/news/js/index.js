@@ -15,7 +15,7 @@ $(function () {
 
         if (clickCid != currentCid) {
             // 记录当前分类id
-            currentCid = clickCid
+            currentCid = Number(clickCid)+1
 
             // 重置分页参数
             cur_page = 1
@@ -47,4 +47,8 @@ $(function () {
 
 function updateNewsData() {
     // TODO 更新新闻数据
+    // alert(currentCid)
+    $.get("/news/list", {
+        "class_id": currentCid
+    })
 }

@@ -1,7 +1,7 @@
 from info import constants
-from info.models import User, News
+from info.models import User, News, Category
 from . import index_blue
-from flask import render_template, current_app, session
+from flask import render_template, current_app, session, request
 
 
 @index_blue.route("/")
@@ -28,13 +28,28 @@ def index():
             news_list.append(news_info.title)
         # print(news_list)
 
-    # 获取当前已经点击的栏目
+    # 获取当前导航
+    nav_info_list = []
+    try:
+        nav_list = Category.query.all()  # 查询出所有的导航栏
 
-    # 定义一个data字典存放数据
+    except Exception as e:
+        current_app.logger.error(e)
+    else:
+        for nav in nav_list:
+            nav_info_list.append(nav.to_dict())
+            print(nav.to_dict())
+
+    print(nav_info_list)
+
     data = {
         'user_dict': user_dict,
-        'news_list': news_list
+        'news_list': news_list,
+        'nav_info_list': nav_info_list
+
     }
+    # 'category_list': category_list
+    # print(category_list)
 
     return render_template('news/index.html', data=data)
 
