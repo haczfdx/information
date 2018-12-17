@@ -15,7 +15,7 @@ $(function () {
 
         if (clickCid != currentCid) {
             // 记录当前分类id
-            currentCid = Number(clickCid)+1
+            currentCid = Number(clickCid)
 
             // 重置分页参数
             cur_page = 1
@@ -48,7 +48,34 @@ $(function () {
 function updateNewsData() {
     // TODO 更新新闻数据
     // alert(currentCid)
-    $.get("/news/list", {
-        "class_id": currentCid
+    var index_content = $(".conter_con .list_con")
+    var content_str = ""
+    $.ajax({
+        url: "/news/list",
+        type: "get",
+        data:{"class_cid": currentCid},
+        success: function (response) {
+            content_data = response.errmsg
+            for (var i=0; i<content_data.length;i++){
+            // console.log(content_data[i].index_image_url)
+            content_str+='<li>'+
+                '<a href="#" class="news_pic fl"><img src="'+content_data[i].index_image_url+'"></a>'+
+                '<a href="#" class="news_title fl">'+content_data[i].title+'</a>'+
+                '<a href="#" class="news_detail fl">'+content_data[i].digest+'</a>'+
+                '<div class="author_info fl">'+
+                    '<div class="author fl">'+
+                        '<img src="../../static/news/images/person.png" alt="author">'+
+                        '<a href="#">'+content_data[i].source+'</a>'+
+                    '</div>'+
+                    '<div class="time fl">'+content_data[i].create_time+'</div>'+
+                '</div>'+
+            '</li>'
+            }
+            index_content.html(content_str)
+            console.log(content_data)
+
+        }
+
     })
+
 }

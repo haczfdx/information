@@ -1,6 +1,7 @@
-from flask import request
-
+from flask import request, jsonify, current_app
 from info import constants
+from info.models import Category, News
+from info.utils.response_code import RET
 from . import news_blue
 
 
@@ -23,25 +24,25 @@ def index_list():
     class_cid = request.args.get("class_cid", 1)
     home_max_news = constants.HOME_PAGE_MAX_NEWS
 
-    # print(nav_list)
-
-    # category_list = []
-    # try:
-    #     class_id = request.args.get("class_id", 1)
-    #     category = Category.query.filter(Category.id == class_id).first()
-    #     category_list_obj = category.news_list.limit(constants.HOME_PAGE_MAX_NEWS).all()
-    #
-    # except Exception as e:
-    #
-    #     current_app.logger.error(e)
-    # else:
-    #     for cate in category_list_obj:
-    #         category_list.append(cate.to_basic_dict())
-
-    # 定义一个data字典存放数据
-    # print(category_list[0])
+    class_cid = int(class_cid)
 
 
+    all_news_list = []
+    try:
+        # 先查询一下最新的数据
+        if class_cid == 1:
+            news_list = News.query.order_by(News.create_time.desc()).limit(home_max_news).all()
+        else:
+            news_list = Category.query.filter(class_cid == Category.id).first().news_list.limit(home_max_news).all()
+        print(news_list)
+    except Exception as e:
+        current_app.logger.error(e)
+    else:
+        # 遍历一下每一个对象，获取
+        for news in news_list:
+            all_news_list.append(news.to_basic_dict())
+            # print(news.to_basic_dict())
 
+    # print(all_news_list)
 
-
+    return jsonify(errno=RET.OK, errmsg=all_news_list)

@@ -38,9 +38,10 @@ def index():
     else:
         for nav in nav_list:
             nav_info_list.append(nav.to_dict())
-            print(nav.to_dict())
+            # print(nav.to_dict())
 
-    print(nav_info_list)
+    # print(nav_info_list)
+
 
     data = {
         'user_dict': user_dict,
