@@ -5,8 +5,8 @@ from flask import Flask
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
+from flask_wtf.csrf import generate_csrf
 from config import config
-
 
 db = SQLAlchemy()
 
@@ -31,12 +31,27 @@ def create_app(config_name):
 
     # 配置redis数据库
     global redis_store  # 使用全局redis
-    redis_store = redis.StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT, decode_responses=True)
+    redis_store = redis.StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT,
+                                    decode_responses=True)
 
     # 开启CSRF保护
     # CSRFProtect(app)
-    #
-    # # 设置Session保存的位置
+    """
+    csrf保护，需要取出表单的csrftoken的值和cookie中的值进行校验
+    表单中的csrftoken可以使用X-CSRFToken的header进行保存
+    cookie中的csrftoken可以每一次请求前进行设置
+    """
+
+    @app.after_request
+    def after_request(response):
+        """在每一次请求之后设置csrftoken的值，将每一次的响应进行进一步的处理"""
+        csrf_token = generate_csrf()
+        # 设置cookie中的csrf的值
+        response.set_cookie("csrf_token", csrf_token)
+        return response
+
+
+    #  设置Session保存的位置
     Session(app)
 
     # 给app添加自定义过滤器
