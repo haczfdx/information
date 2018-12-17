@@ -35,8 +35,9 @@ def create_app(config_name):
                                     decode_responses=True)
 
     # 开启CSRF保护
-    # CSRFProtect(app)
+    CSRFProtect(app)
     """
+    CSRFProtect(app) 会自动判断header中的X-CSRFToken的值与cookie中的csrf_token的值是否相等不相等不提交
     csrf保护，需要取出表单的csrftoken的值和cookie中的值进行校验
     表单中的csrftoken可以使用X-CSRFToken的header进行保存
     cookie中的csrftoken可以每一次请求前进行设置
@@ -49,7 +50,6 @@ def create_app(config_name):
         # 设置cookie中的csrf的值
         response.set_cookie("csrf_token", csrf_token)
         return response
-
 
     #  设置Session保存的位置
     Session(app)

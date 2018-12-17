@@ -25,6 +25,9 @@ $(function () {
             type:"post",
             data: JSON.stringify(param),
             contentType: "application/json",
+            headers:{
+                "X-CSRFToken": getCookie("csrf_token")
+            },
             success: function (response) {
                      if (response.errno == 0){
                     // 代表登录成功
@@ -68,11 +71,11 @@ $(function () {
         }
 
         // 对密码长度的判断
-		// if (password.length < 6) {
-        //     $("#register-password-err").html("密码长度不能少于6位");
-        //     $("#register-password-err").show();
-        //     return;
-        // }
+		if (password.length < 6) {
+            $("#register-password-err").html("密码长度不能少于6位");
+            $("#register-password-err").show();
+            return;
+        }
 
         // 发起注册请求
         param = {
@@ -88,6 +91,9 @@ $(function () {
             // dataType: "json",
             contentType:'application/json',
             data:JSON.stringify(param),
+            headers:{
+              "X-CSRFToken": getCookie("csrf_token")
+            },
             success:function (response) {
                 if (response.errno == 0){
                     // 代表注册成功
@@ -151,6 +157,9 @@ function sendSMSCode() {
         // dataType: "json",
         data: JSON.stringify(formData),
         contentType:'application/json',
+        headers:{
+            "X-CSRFToken": getCookie("csrf_token")
+        },
         success:function (response) {
             if (response.errno==0){
                 // 发送成功显示出发送成功
