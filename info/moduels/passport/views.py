@@ -46,7 +46,7 @@ def login():
         return jsonify(errno=RET.LOGINERR, errmsg="请输入正确的用户名")
 
     if not user.check_passoword(password):
-        return jsonify(errno=RET.OK, errmsg="密码错误")
+        return jsonify(errno=RET.LOGINERR, errmsg="密码错误")
 
     # 已经验证成功用户名和密码了，开始修改最后一次的登录的时候
 
@@ -69,7 +69,7 @@ def login():
 @passport_blue.route("/register", methods=["POST"])
 def register():
     """实现用户在注册按钮点击之后实现的接口"""
-    print(request.json)
+    # print(request.json)
 
     # 先表单数据传送过来的所有的值
     mobile = request.json.get("mobile")
@@ -87,7 +87,7 @@ def register():
     # 通过手机号码去redis中取出对应的数据进行判断
     try:
         redis_sms_code = redis_store.get("sms_" + mobile)
-        print("手机验证码为：", redis_sms_code)
+        # print("手机验证码为：", redis_sms_code)
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(error=RET.DBERR, errmsg="这个手机号码没有发送验证码")
@@ -157,7 +157,7 @@ def send_sms_code():
     try:
         # print("imageCode_" + image_code_id)
         redis_image_code = redis_store.get("imageCodeId_" + image_code_id)
-        print("验证码：", redis_image_code)
+        # print("验证码：", redis_image_code)
     except Exception as e:
         current_app.logger.error(e)
         # return jsonify(errno=RET.PARAMERR, errmsg="请输入正确的电话号码")
@@ -172,8 +172,8 @@ def send_sms_code():
 
     # 生成一个6位数的随机数
     authcode = "%06d" % random.randint(0, 999999)
-    print("手机验证码是：", authcode)
-    current_app.logger.debug("验证码是：" + str(authcode))
+    # print("手机验证码是：", authcode)
+    current_app.logger.debug("手机的验证码是：" + str(authcode))
 
     # # 下面实现验证码的功能，这里已经测试成功就暂时不给手机发送，直接打印出验证码
     # result = CCP().send_template_sms(mobile, [authcode, int(constants.SMS_CODE_REDIS_EXPIRES / 60)], 1)

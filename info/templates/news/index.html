@@ -23,21 +23,21 @@
                 <li data-cid="4"><a href="javascript:;">外汇</a></li>
                 <li data-cid="5"><a href="javascript:;">公司</a></li>
             </ul>
-            {% if data==None %}
+            {% if data.user_dict==None %}
                   <div class="user_btns fr">
                 <a href="javascript:;" class="login_btn">登录</a> / <a href="javascript:;" class="register_btn">注册</a>
             </div>
                 {% else %}
                 <!-- 用户登录后显示下面，隐藏上面 -->
                 <div class="user_login fr">
-                    <img src="{% if data.avatar_url == None %}
+                    <img src="{% if data.user_dict.avatar_url == None %}
                     ../../static/news/images/person01.png
                     {% else %}
-                    {{ data.avatar_url }}
+                    {{ data.user_dict.avatar_url }}
 {#                    static/news/images/headImage/a36a08a65f1234e5774a13a755e84db0.jpg#}
                     {% endif %}" class="lgin_pic">
-                    {#                {{ data }}#}
-                    <a href="#">{{ data.nick_name }}</a>
+                    {#                {{ data.user_dict }}#}
+                    <a href="#">{{ data.user_dict.nick_name }}</a>
                     <a href="javascript:;" onclick="logout()">退出</a>
                 </div>
             {% endif %}
@@ -103,7 +103,7 @@
             <ul class="rank_list">
                 {# 这段数据进行从数据库读取，然后返回 #}
 {#                使用模板if的方式#}
-{#                {% for news in news_list %}#}
+{#                {% for news in data.news_list %}#}
 {#                    <li><span class="#}
 {#                    {% if loop.index==1 %}#}
 {#                    first#}
@@ -115,7 +115,7 @@
 {#                {% endfor %}#}
 
             {#            过滤器的方式#}
-                {% for news in news_list %}
+                {% for news in data.news_list %}
                           <li><span class="{{ loop.index | rank_class }}">{{ loop.index }}</span><a href="#">{{ news }}</a></li>
                 {% endfor %}
 

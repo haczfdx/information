@@ -7,6 +7,7 @@ from base64 import b64encode
 class Config(object):
     """项目的配置文件的父类"""
     # 配置一些app的基础的设置
+    ENV = ""
     DEBUG = True
     SECRET_KEY = b64encode(os.urandom(64))
 

@@ -29,8 +29,9 @@ $(function () {
                 "X-CSRFToken": getCookie("csrf_token")
             },
             success: function (response) {
-                     if (response.errno == 0){
+                if (response.errno == 0){
                     // 代表登录成功
+
                     location.reload()
                 }
                 else {
@@ -237,4 +238,19 @@ function logout() {
         location.reload()
 
     })
+
+    // $.ajax({
+    //     url: "/passport/logout",
+    //     type: "post",
+    //     // contentType: "application/json",
+    //     // headers: {
+    //     //     "X-CSRFToken": getCookie("csrf_token")
+    //     // },
+    //     success: function (resp) {
+    //         // 刷新当前界面
+    //
+    //         location.reload()
+    //     }
+    // })
+
 }
