@@ -78,7 +78,7 @@
             {#                {% endfor %}#}
             {#            过滤器的方式#}
             {% for news in data.news_list %}
-                <li><span class="{{ loop.index | rank_class }}">{{ loop.index }}</span><a href="#">{{ news }}</a></li>
+                <li><span class="{{ loop.index | rank_class }}">{{ loop.index }}</span><a href="{{ news.id }}">{{ news.title }}</a></li>
             {% endfor %}
         </ul>
 

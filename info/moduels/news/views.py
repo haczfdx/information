@@ -36,7 +36,7 @@ def news_details(news_id):
 
     if news_rank_info:
         for news_info in news_rank_info:
-            news_list.append(news_info.title)
+            news_list.append(news_info.to_review_dict())
 
     data = {
         'user_dict': user.to_admin_dict() if user else None,

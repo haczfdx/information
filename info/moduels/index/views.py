@@ -81,8 +81,7 @@ def index():
 
     if news_rank_info:
         for news_info in news_rank_info:
-            news_list.append(news_info.title)
-        # print(news_list)
+            news_list.append(news_info.to_review_dict())
 
     # 获取当前导航
     nav_info_list = []
@@ -98,7 +97,7 @@ def index():
     # print(nav_info_list)
 
     data = {
-        'user_dict': user.to_admin_dict() if user else  None,
+        'user_dict': user.to_admin_dict() if user else None,
         'news_list': news_list,
         'nav_info_list': nav_info_list
 
