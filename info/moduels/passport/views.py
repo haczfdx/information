@@ -219,6 +219,8 @@ def get_image_code():
         current_app.logger.error(e)
 
 
+
+
     response = make_response(image)
     response.headers["Content-Type"] = "image/jpg"
 

@@ -1,6 +1,7 @@
 .idea/
 logs/log*
 migrations
+待优化
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
