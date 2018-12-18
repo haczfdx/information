@@ -1,8 +1,9 @@
 from info import constants
 from info.models import User, News, Category
+from info.utils.common import user_login_status
 from info.utils.response_code import RET
 from . import index_blue
-from flask import render_template, current_app, session, request, jsonify
+from flask import render_template, current_app, session, request, jsonify, g
 
 
 @index_blue.route("news_list")
@@ -64,13 +65,10 @@ def news_list():
 
 
 @index_blue.route("/")
+@user_login_status
 def index():
     # 通过session来判断现在是否登录
-    user_id = session.get("user_id")  # 通过user_id来取出user的值
-    user_dict = None
-    if user_id:
-        user = User.query.filter(User.id == user_id).first()  # 只有在取到值得前提下才去查询
-        user_dict = user.to_admin_dict()
+    user = g.user
 
     """主页的右侧的排行"""
     # 数据库查询排行之后的数据，只取出配置中显示个数的值
@@ -90,10 +88,9 @@ def index():
     nav_info_list = []
     try:
         nav_list = Category.query.all()  # 查询出所有的导航栏
-
     except Exception as e:
         current_app.logger.error(e)
-    else:
+    if nav_list:
         for nav in nav_list:
             nav_info_list.append(nav.to_dict())
             # print(nav.to_dict())
@@ -101,7 +98,7 @@ def index():
     # print(nav_info_list)
 
     data = {
-        'user_dict': user_dict,
+        'user_dict': user.to_admin_dict() if user else  None,
         'news_list': news_list,
         'nav_info_list': nav_info_list
 

@@ -15,7 +15,7 @@
         <h3>{{ data.news_data.title }}</h3>
         <div class="detail_about clearfix">
             <span class="time_souce fl">{{ data.news_data.create_time }} 来源: {{ data.news_data.source }}</span>
-            <span class="comment fr">3</span>
+            <span class="comment fr">{{ data.news_data.comments_count }}</span>
         </div>
 
         <p class="summary">
@@ -43,7 +43,7 @@
 
 
         <div class="comment_count">
-            4条评论
+            {{ data.news_data.comments_count }}条评论
         </div>
 
         <div class="comment_list_con">

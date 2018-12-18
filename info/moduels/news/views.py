@@ -1,11 +1,13 @@
-from flask import request, jsonify, current_app, render_template, abort, session
+from flask import request, jsonify, current_app, render_template, abort, session, g
 from info import constants
 from info.models import Category, News, User
+from info.utils.common import user_login_status
 from info.utils.response_code import RET
 from . import news_blue
 
 
 @news_blue.route("/<int:news_id>")
+@user_login_status
 def news_details(news_id):
     """
     获取新闻的详情页面
@@ -13,12 +15,8 @@ def news_details(news_id):
         根据news_id来获取获取数据库的内容在details的模板中进行渲染
     :return:
     """
-    # 通过session来判断现在是否登录
-    user_id = session.get("user_id")  # 通过user_id来取出user的值
-    user_dict = None
-    if user_id:
-        user = User.query.filter(User.id == user_id).first()  # 只有在取到值得前提下才去查询
-        user_dict = user.to_admin_dict()
+    # 通过session来判断现在是否登录，可以通过全局G变量来存储
+    user = g.user
 
     # 从数据库中提取出指定news的数据
     try:
@@ -41,7 +39,7 @@ def news_details(news_id):
             news_list.append(news_info.title)
 
     data = {
-        'user_dict': user_dict,
+        'user_dict': user.to_admin_dict() if user else None,
         'news_data': news.to_dict() if news else None,
         'news_list': news_list
     }
