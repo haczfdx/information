@@ -26,23 +26,24 @@ def news_list():
     # page_all_data = request.args.get("page_all_data", 10)  # 每一页显示的数量
     per_page = constants.HOME_PAGE_MAX_NEWS  # 每一页显示的数量
 
-    # 校验参数
-    # 请求过来的参数必须是数值类型的数据
-    class_id = int(class_id)
-    page = int(page)
+    # 校验参数，请求过来的参数必须是数值类型的数据
+    try:
+        class_id = int(class_id)
+        page = int(page)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DATAERR, errmsg="参数出错")
 
     query_list = []
     if class_id != 1:
         # 如果不是查询最新的那么就要append查询参数，参数参数为列表，可以在filter中前面加*解包
         query_list.append(News.category_id == class_id)
+    try:
+        paginate = News.query.filter(*query_list).order_by(News.create_time.desc()).paginate(page, per_page)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="数据库查询错误")
 
-    paginate = News.query.filter(*query_list).order_by(News.create_time.desc()).paginate(page, per_page)
-    print(class_id)
-    # print(paginate.items)
-    # print(paginate.pages)
-    # print(paginate.page)
-    # print(paginate.total)
-    # print(News.query.count())
     # 相当于执行了.limit(per_page).offset(per_page*(page-1)).all()
     news_obj_list = paginate.items  # 获取所有的页面对象
     all_page = paginate.pages  # 总页数
@@ -58,33 +59,8 @@ def news_list():
         'current_page': current_page,
         'news_list': news_list
     }
+
     return jsonify(errno=RET.OK, errmsg="获取数据成功", data=data)
-
-    #
-    # # 获取分类的编号，如果用户没有get数据那么默认分类的编号就是最近
-    # class_cid = request.args.get("class_cid", 1)
-    #
-    # class_cid = int(class_cid)
-    #
-    # all_news_list = []
-    # try:
-    #     # 先查询一下最新的数据
-    #     if class_cid == 1:
-    #         news_list = News.query.order_by(News.create_time.desc()).limit(home_max_news).all()
-    #     else:
-    #         news_list = Category.query.filter(class_cid == Category.id).first().news_list.limit(home_max_news).all()
-    #     print(news_list)
-    # except Exception as e:
-    #     current_app.logger.error(e)
-    # else:
-    #     # 遍历一下每一个对象，获取
-    #     for news in news_list:
-    #         all_news_list.append(news.to_basic_dict())
-    #         # print(news.to_basic_dict())
-    #
-    # # print(all_news_list)
-
-    # return jsonify(errno=RET.OK, errmsg=all_news_list)
 
 
 @index_blue.route("/")
