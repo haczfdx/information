@@ -73,12 +73,12 @@ function updateNewsData() {
         },
         success: function (response) {
             if (response.errno == 0) {
-                content_data = response.data.news_list
+                  content_data = response.data.news_list
                 for (var i = 0; i < content_data.length; i++) {
                     content_str = '<li>' +
-                        '<a href="#" class="news_pic fl"><img src="' + content_data[i].index_image_url + '"></a>' +
-                        '<a href="#" class="news_title fl">' + content_data[i].title + '</a>' +
-                        '<a href="#" class="news_detail fl">' + content_data[i].digest + '</a>' +
+                        '<a href="news/' + content_data[i].id + '"" class="news_pic fl"><img src="' + content_data[i].index_image_url + '"></a>' +
+                        '<a href="news/' + content_data[i].id + '" class="news_title fl">' + content_data[i].title + '</a>' +
+                        '<a href="news/' + content_data[i].id + '" class="news_detail fl">' + content_data[i].digest + '</a>' +
                         '<div class="author_info fl">' +
                         '<div class="author fl">' +
                         '<img src="../../static/news/images/person.png" alt="author">' +

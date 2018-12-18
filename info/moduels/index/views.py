@@ -74,7 +74,6 @@ def index():
 
     """主页的右侧的排行"""
     # 数据库查询排行之后的数据，只取出配置中显示个数的值
-
     news_list = []
     news_rank_info = None
     try:
