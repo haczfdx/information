@@ -1,9 +1,62 @@
 from flask import request, jsonify, current_app, render_template, abort, session, g
 from info import constants, db
-from info.models import Category, News, User
+from info.models import Category, News, User, Comment
 from info.utils.common import user_login_status, commit
 from info.utils.response_code import RET
 from . import news_blue
+
+
+@news_blue.route("/news_comment_add", methods=["POST"])
+@user_login_status
+def news_comment_add():
+    """
+    用户提交评论的接口
+    1. 获取参数
+    2. 校验参数
+    3. 返回JSON数据
+    :return:
+    """
+    user = g.user
+    if not user:
+        return jsonify(errno=RET.LOGINERR, errmsg="你还没有登录")
+
+    # print(request.args)
+    news_id = request.json.get("news_id")
+    comment_text = request.json.get("comment_text")
+
+    print(news_id)
+    print(comment_text)
+    # 校验参数
+    if not all([news_id, comment_text]):
+        current_app.logger.error("非法参数")
+        return jsonify(errno=RET.DATAERR, errmsg="非法参数")
+
+    # 可以在这边控制评论字的数量比如200字
+    if len(comment_text) > 200:
+        return jsonify(errno=RET.DATAERR, errmsg="字数不能超过200字")
+
+    # 读取出对应新闻的数据
+    try:
+        news = News.query.filter(News.id == news_id).first()
+        if not news:
+            return jsonify(errno=RET.NODATA, errmsg="收藏出错，没有这个新闻")
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="数据库链接错误")
+
+    comment = Comment()
+    comment.user_id = user.id
+    comment.news_id = news.id
+    comment.content = comment_text
+
+    try:
+        db.session.add(comment)
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="数据库提交出错")
+
+    return jsonify(errno=RET.OK, errmsg="OK")
 
 
 @news_blue.route("/news_collect", methods=["POST"])
@@ -63,9 +116,8 @@ def news_details(news_id):
         根据news_id来获取获取数据库的内容在details的模板中进行渲染
     :return:
     """
-    # 通过session来判断现在是否登录，可以通过全局G变量来存储
-    user = g.user
 
+    user = g.user
 
     # 从数据库中提取出指定news的数据
     try:
@@ -94,15 +146,27 @@ def news_details(news_id):
         if news in user.collection_news:
             is_collection = True
 
-
     # 查询当前新闻的所有的评论
-    try:
-        comments = news.comments.all()
 
+    comments = []
+    try:
+        comments = news.comments.order_by(Comment.create_time.desc()).all()
     except Exception as e:
         current_app.logger.error(e)
 
+    comments_parent_list = []
+    comments_child_list = []
+    # print(comments[0].to_dict())
+    for comment in comments:
+        if comment.to_dict()["parent"]:
+            """这样就是父类的评论"""
+            comments_child_list.append(comment.parent)
+        else:
+            comments_parent_list.append(comment.to_dict())
 
+    print(comments_parent_list)
+    print(comments_child_list)
+        # comments_list.append(comment.to_dict())
 
     # 新闻的点击次数加一
     news.clicks += 1
@@ -112,7 +176,9 @@ def news_details(news_id):
         'user_dict': user.to_dict() if user else None,
         'news_data': news.to_dict() if news else None,
         'news_list': news_list,
-        "is_collection": is_collection
+        "is_collection": is_collection,
+        'comments_parent_list': comments_parent_list,
+        'comments_child_list': comments_child_list
 
     }
 

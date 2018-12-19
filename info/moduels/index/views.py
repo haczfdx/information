@@ -93,7 +93,7 @@ def index():
     # print(nav_info_list)
 
     data = {
-        'user_dict': user.to_admin_dict() if user else None,
+        'user_dict': user.to_dict() if user else None,
         'news_list': news_list,
         'nav_info_list': nav_info_list
 

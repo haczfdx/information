@@ -26,27 +26,27 @@
 
 
         {% if data.is_collection %}
-         <a href="javascript:;" class="collected block-center"  news_id="{{ data.news_data.id }}"><span class="out">已收藏</span><span
-                class="over">取消收藏</span></a>
+            <a href="javascript:;" class="collected block-center" news_id="{{ data.news_data.id }}"><span class="out">已收藏</span><span
+                    class="over">取消收藏</span></a>
 
         {% else %}
-             <a href="javascript:;" class="collection block-center" news_id="{{ data.news_data.id }}">收藏</a>
+            <a href="javascript:;" class="collection block-center" news_id="{{ data.news_data.id }}">收藏</a>
         {% endif %}
 
-         {% if data.user_dict %}
+        {% if data.user_dict %}
 
-        <form action="" class="comment_form">
-            <div class="person_pic">
-                <img src="../../static/news/images/cat.jpg" alt="用户图标">
+            <form action="" class="comment_form" news_id="{{ data.news_data.id }}">
+                <div class="person_pic">
+                    <img src="../../static/news/images/cat.jpg" alt="用户图标">
+                </div>
+                <textarea placeholder="请发表您的评论" class="comment_input"></textarea>
+                <input type="submit" name="" value="评 论" class="comment_sub">
+            </form>
+
+        {% else %}
+            <div class="comment_form_logout">
+                登录发表你的评论
             </div>
-            <textarea placeholder="请发表您的评论" class="comment_input"></textarea>
-            <input type="submit" name="" value="评 论" class="comment_sub">
-        </form>
-
-         {% else %}
-              <div class="comment_form_logout">
-            登录发表你的评论
-        </div>
         {% endif %}
 
 
@@ -55,85 +55,104 @@
             {{ data.news_data.comments_count }}条评论
         </div>
 
-        <div class="comment_list_con">
-            <div class="comment_list">
-                <div class="person_pic fl">
-                    <img src="../../static/news/images/worm.jpg" alt="用户图标">
-                </div>
-                <div class="user_name fl">用户张山</div>
-                <div class="comment_text fl">
-                    遏制茅台酒价格过快上涨，多渠道供给，就不一定要买，租茅台酒也可以的，租售同权。开发共有产权茅台酒，让老百姓喝得起茅台酒，饮者有其酒。
-                </div>
-                <div class="reply_text_con fl">
-                    <div class="user_name2">用户李思</div>
-                    <div class="reply_text">
-                        遏制茅台酒价格过快上涨，多渠道供给，就不一定要买，租茅台酒也可以的，租售同权。开发共有产权茅台酒，让老百姓喝得起茅台酒，饮者有其酒。
+
+        {% for comments_parent in data.comments_parent_list %}
+            <div class="comment_list_con">
+                <div class="comment_list">
+                    <div class="person_pic fl">
+                        <img src="{% if data.user_dict.avatar_url == None %}
+                    ../../static/news/images/worm.jpg
+                    {% else %}
+                    ../../static/news/images/headImage/{{ comments_parent.user.this_avatar_url }}
+
+{#                    static/news/images/headImage/a36a08a65f1234e5774a13a755e84db0.jpg#}
+
+                    {% endif %}" alt="用户图标">
+
                     </div>
-                </div>
-                <div class="comment_time fl">2017-01-01 00:00:00</div>
-                <a href="javascript:;" class="comment_up has_comment_up fr">1</a>
-                <a href="javascript:;" class="comment_reply fr">回复</a>
-                <from class="reply_form fl">
-                    <textarea class="reply_input"></textarea>
-                    <input type="submit" name="" value="回复" class="reply_sub fr">
-                    <input type="reset" name="" value="取消" class="reply_cancel fr">
-                </from>
-            </div>
+                    <div class="user_name fl">{{ comments_parent.user.nick_name }}</div>
+                    <div class="comment_text fl">
+                       {{ comments_parent.content }}
+                    </div>
+                    {% for comments_child in data.comments_child_list %}
+                        {% if comments_child.id == comments_parent.id %}
+                          <div class="reply_text_con fl">
+                        <div class="user_name2">{{ comments_child.user.nick_name }}</div>
+                        <div class="reply_text">
+                             {{ comments_parent.comments_child }}
+                        </div>
+                    </div>
+                        {% endif %}
 
-            <div class="comment_list">
-                <div class="person_pic fl">
-                    <img src="../../static/news/images/worm.jpg" alt="用户图标">
-                </div>
-                <div class="user_name fl">用户张山</div>
-                <div class="comment_text fl">
-                    遏制茅台酒价格过快上涨，多渠道供给，就不一定要买，租茅台酒也可以的，租售同权。开发共有产权茅台酒，让老百姓喝得起茅台酒，饮者有其酒。
-                </div>
-                <div class="comment_time fl">2017-01-01 00:00:00</div>
-                <a href="javascript:;" class="comment_up fr">赞</a>
-                <a href="javascript:;" class="comment_reply fr">回复</a>
-                <from class="reply_form fl">
-                    <textarea class="reply_input"></textarea>
-                    <input type="submit" name="" value="回复" class="reply_sub fr">
-                    <input type="reset" name="" value="取消" class="reply_cancel fr">
-                </from>
-            </div>
+                    {% endfor %}
 
-            <div class="comment_list">
-                <div class="person_pic fl">
-                    <img src="../../static/news/images/worm.jpg" alt="用户图标">
-                </div>
-                <div class="user_name fl">用户张山</div>
-                <div class="comment_text fl">
-                    遏制茅台酒价格过快上涨，多渠道供给，就不一定要买，租茅台酒也可以的，租售同权。开发共有产权茅台酒，让老百姓喝得起茅台酒，饮者有其酒。
-                </div>
-                <div class="comment_time fl">2017-01-01 00:00:00</div>
-                <a href="javascript:;" class="comment_up fr">赞</a>
-                <a href="javascript:;" class="comment_reply fr">回复</a>
-                <from class="reply_form fl">
-                    <textarea class="reply_input"></textarea>
-                    <input type="submit" name="" value="回复" class="reply_sub fr">
-                    <input type="reset" name="" value="取消" class="reply_cancel fr">
-                </from>
-            </div>
 
-            <div class="comment_list">
-                <div class="person_pic fl">
-                    <img src="../../static/news/images/worm.jpg" alt="用户图标">
+                    <div class="comment_time fl">{{ comments_parent.create_time }}</div>
+                    <a href="javascript:;" class="comment_up has_comment_up fr">{{ comments_parent.like_count }}</a>
+                    <a href="javascript:;" class="comment_reply fr">回复</a>
+{#                    {{ comments_parent }}#}
+                    <from class="reply_form fl">
+                        <textarea class="reply_input"></textarea>
+                        <input type="submit" name="" value="回复" class="reply_sub fr">
+                        <input type="reset" name="" value="取消" class="reply_cancel fr">
+                    </from>
                 </div>
-                <div class="user_name fl">用户张山</div>
-                <div class="comment_text fl">
-                    遏制茅台酒价格过快上涨，多渠道供给，就不一定要买，租茅台酒也可以的，租售同权。开发共有产权茅台酒，让老百姓喝得起茅台酒，饮者有其酒。
-                </div>
-                <div class="comment_time fl">2017-01-01 00:00:00</div>
-                <a href="javascript:;" class="comment_up fr">赞</a>
-                <a href="javascript:;" class="comment_reply fr">回复</a>
-                <from class="reply_form fl">
-                    <textarea class="reply_input"></textarea>
-                    <input type="submit" name="" value="回复" class="reply_sub fr">
-                    <input type="reset" name="" value="取消" class="reply_cancel fr">
-                </from>
+{##}
+{#                <div class="comment_list">#}
+{#                    <div class="person_pic fl">#}
+{#                        <img src="../../static/news/images/worm.jpg" alt="用户图标">#}
+{#                    </div>#}
+{#                    <div class="user_name fl">用户张山</div>#}
+{#                    <div class="comment_text fl">#}
+{#                        遏制茅台酒价格过快上涨，多渠道供给，就不一定要买，租茅台酒也可以的，租售同权。开发共有产权茅台酒，让老百姓喝得起茅台酒，饮者有其酒。#}
+{#                    </div>#}
+{#                    <div class="comment_time fl">2017-01-01 00:00:00</div>#}
+{#                    <a href="javascript:;" class="comment_up fr">赞</a>#}
+{#                    <a href="javascript:;" class="comment_reply fr">回复</a>#}
+{#                    <from class="reply_form fl">#}
+{#                        <textarea class="reply_input"></textarea>#}
+{#                        <input type="submit" name="" value="回复" class="reply_sub fr">#}
+{#                        <input type="reset" name="" value="取消" class="reply_cancel fr">#}
+{#                    </from>#}
+{#                </div>#}
+{##}
+{#                <div class="comment_list">#}
+{#                    <div class="person_pic fl">#}
+{#                        <img src="../../static/news/images/worm.jpg" alt="用户图标">#}
+{#                    </div>#}
+{#                    <div class="user_name fl">用户张山</div>#}
+{#                    <div class="comment_text fl">#}
+{#                        遏制茅台酒价格过快上涨，多渠道供给，就不一定要买，租茅台酒也可以的，租售同权。开发共有产权茅台酒，让老百姓喝得起茅台酒，饮者有其酒。#}
+{#                    </div>#}
+{#                    <div class="comment_time fl">2017-01-01 00:00:00</div>#}
+{#                    <a href="javascript:;" class="comment_up fr">赞</a>#}
+{#                    <a href="javascript:;" class="comment_reply fr">回复</a>#}
+{#                    <from class="reply_form fl">#}
+{#                        <textarea class="reply_input"></textarea>#}
+{#                        <input type="submit" name="" value="回复" class="reply_sub fr">#}
+{#                        <input type="reset" name="" value="取消" class="reply_cancel fr">#}
+{#                    </from>#}
+{#                </div>#}
+{##}
+{#                <div class="comment_list">#}
+{#                    <div class="person_pic fl">#}
+{#                        <img src="../../static/news/images/worm.jpg" alt="用户图标">#}
+{#                    </div>#}
+{#                    <div class="user_name fl">用户张山</div>#}
+{#                    <div class="comment_text fl">#}
+{#                        遏制茅台酒价格过快上涨，多渠道供给，就不一定要买，租茅台酒也可以的，租售同权。开发共有产权茅台酒，让老百姓喝得起茅台酒，饮者有其酒。#}
+{#                    </div>#}
+{#                    <div class="comment_time fl">2017-01-01 00:00:00</div>#}
+{#                    <a href="javascript:;" class="comment_up fr">赞</a>#}
+{#                    <a href="javascript:;" class="comment_reply fr">回复</a>#}
+{#                    <from class="reply_form fl">#}
+{#                        <textarea class="reply_input"></textarea>#}
+{#                        <input type="submit" name="" value="回复" class="reply_sub fr">#}
+{#                        <input type="reset" name="" value="取消" class="reply_cancel fr">#}
+{#                    </from>#}
+{#                </div>#}
             </div>
-        </div>
+        {% endfor %}
 
 
     </div>
@@ -143,21 +162,21 @@
 
 {% block author %}
     {% if data.user_dict %}
-         <div class="author_card">
-        <a href="#" class="author_pic"><img src="{% if data.user_dict.avatar_url == None %}
+        <div class="author_card">
+            <a href="#" class="author_pic"><img src="{% if data.user_dict.avatar_url == None %}
                     ../../static/news/images/person01.png
                     {% else %}
                     ../../static/news/images/headImage/{{ data.user_dict.this_avatar_url }}
 {#                    static/news/images/headImage/a36a08a65f1234e5774a13a755e84db0.jpg#}
 
                     {% endif %}"></a>
-        <a href="#" class="author_name">{{ data.user_dict.nick_name }}</a>
-        <div class="author_resume">{{ data.user_dict.signature }}</div>
-        <div class="writings"><span>总篇数</span><b>{{ data.user_dict.news_count }}</b></div>
-        <div class="follows"><span>粉丝</span><b>{{ data.user_dict.followers_count }}</b></div>
-        <a href="javascript:;" class="focus fr">关注</a>
-        <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
-    </div>
+            <a href="#" class="author_name">{{ data.user_dict.nick_name }}</a>
+            <div class="author_resume">{{ data.user_dict.signature }}</div>
+            <div class="writings"><span>总篇数</span><b>{{ data.user_dict.news_count }}</b></div>
+            <div class="follows"><span>粉丝</span><b>{{ data.user_dict.followers_count }}</b></div>
+            <a href="javascript:;" class="focus fr">关注</a>
+            <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
+        </div>
     {% endif %}
 
 {% endblock %}

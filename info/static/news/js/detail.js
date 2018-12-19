@@ -4,7 +4,8 @@ function getCookie(name) {
 }
 
 
-$(function(){
+$(function () {
+    var news_id = $(this).attr("news_id")
 
     // 打开登录框
     $('.comment_form_logout').click(function () {
@@ -21,19 +22,20 @@ $(function(){
 
         $.ajax({
             url: "/news/news_collect",
-            type:"POST",
+            type: "POST",
             contentType: "application/json",
-            headers:{
-                'X-CSRFToken':getCookie("csrf_token")
+            headers: {
+                'X-CSRFToken': getCookie("csrf_token")
             },
-            data:JSON.stringify(param),
+            data: JSON.stringify(param),
             success: function (response) {
-                if (response.errno==0){
+                if (response.errno == 0) {
                     // 代表请求数据成功执行
-                     location.reload()
+                    location.reload()
                     // alert(response.errmsg)
-
-                }else{
+                } else if (response.errno == 4102) {
+                    $('.login_form_con').show()
+                } else {
                     // 请求失败
                     alert(response.errmsg)
                 }
@@ -42,12 +44,12 @@ $(function(){
             }
         })
 
-       
+
     })
 
     // 取消收藏
     $(".collected").click(function () {
-var news_id = $(this).attr("news_id")
+        var news_id = $(this).attr("news_id")
         param = {
             "news_id": news_id,
             "avtive": "collected"
@@ -55,18 +57,18 @@ var news_id = $(this).attr("news_id")
 
         $.ajax({
             url: "/news/news_collect",
-            type:"POST",
+            type: "POST",
             contentType: "application/json",
-            headers:{
-                'X-CSRFToken':getCookie("csrf_token")
+            headers: {
+                'X-CSRFToken': getCookie("csrf_token")
             },
-            data:JSON.stringify(param),
+            data: JSON.stringify(param),
             success: function (response) {
-                if (response.errno==0){
+                if (response.errno == 0) {
                     // 代表请求数据成功执行
                     // alert(response.errmsg)
                     location.reload()
-                }else{
+                } else {
                     // 请求失败
                     alert(response.errmsg)
                 }
@@ -74,48 +76,70 @@ var news_id = $(this).attr("news_id")
 
             }
         })
-     
+
     })
 
-        // 评论提交
+    // 评论提交
     $(".comment_form").submit(function (e) {
+        var comment_text = $(".comment_input").val()
+        var news_id = $(".comment_form").attr("news_id")
+        param = {
+            'comment_text': comment_text,
+            'news_id': news_id
+        }
         e.preventDefault();
+        $.ajax({
+            url: "/news/news_comment_add",
+            type: "POST",
+            contentType: "application/json",
+            headers: {"X-CSRFToken": getCookie("csrf_token")},
+            data: JSON.stringify(param),
+            success: function (response) {
+                if (response.errno == 0) {
+                    // 请求成功
+                    alert(response.errmsg)
 
+                }else if (response.errno == 4102) {
+                    $('.login_form_con').show()
+                }
+
+                else {
+                    // 请求失败
+                    alert(response.errmsg)
+                }
+
+            }
+        })
     })
 
-    $('.comment_list_con').delegate('a,input','click',function(){
+    $('.comment_list_con').delegate('a,input', 'click', function () {
 
         var sHandler = $(this).prop('class');
 
-        if(sHandler.indexOf('comment_reply')>=0)
-        {
+        if (sHandler.indexOf('comment_reply') >= 0) {
             $(this).next().toggle();
         }
 
-        if(sHandler.indexOf('reply_cancel')>=0)
-        {
+        if (sHandler.indexOf('reply_cancel') >= 0) {
             $(this).parent().toggle();
         }
 
-        if(sHandler.indexOf('comment_up')>=0)
-        {
+        if (sHandler.indexOf('comment_up') >= 0) {
             var $this = $(this);
-            if(sHandler.indexOf('has_comment_up')>=0)
-            {
+            if (sHandler.indexOf('has_comment_up') >= 0) {
                 // 如果当前该评论已经是点赞状态，再次点击会进行到此代码块内，代表要取消点赞
                 $this.removeClass('has_comment_up')
-            }else {
+            } else {
                 $this.addClass('has_comment_up')
             }
         }
 
-        if(sHandler.indexOf('reply_sub')>=0)
-        {
+        if (sHandler.indexOf('reply_sub') >= 0) {
             alert('回复评论')
         }
     })
 
-        // 关注当前新闻作者
+    // 关注当前新闻作者
     $(".focus").click(function () {
 
     })
