@@ -23,6 +23,7 @@ def news_comment_add():
     # print(request.args)
     news_id = request.json.get("news_id")
     comment_text = request.json.get("comment_text")
+    parent_id = request.json.get("parent_id")
 
     print(news_id)
     print(comment_text)
@@ -48,6 +49,7 @@ def news_comment_add():
     comment.user_id = user.id
     comment.news_id = news.id
     comment.content = comment_text
+    comment.parent_id = parent_id
 
     try:
         db.session.add(comment)
@@ -160,11 +162,11 @@ def news_details(news_id):
     for comment in comments:
         if comment.to_dict()["parent"]:
             """这样就是父类的评论"""
-            comments_child_list.append(comment.parent)
+            comments_child_list.append(comment.to_dict())
         else:
             comments_parent_list.append(comment.to_dict())
 
-    print(comments_parent_list)
+    # print(comments_parent_list)
     print(comments_child_list)
         # comments_list.append(comment.to_dict())
 

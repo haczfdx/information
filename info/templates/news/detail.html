@@ -75,11 +75,12 @@
                        {{ comments_parent.content }}
                     </div>
                     {% for comments_child in data.comments_child_list %}
-                        {% if comments_child.id == comments_parent.id %}
+{#                        {{ comments_child }}#}
+                        {% if comments_child.parent.id == comments_parent.id %}
                           <div class="reply_text_con fl">
-                        <div class="user_name2">{{ comments_child.user.nick_name }}</div>
+                        <div class="user_name2">{{ comments_child.user.nick_name}}</div>
                         <div class="reply_text">
-                             {{ comments_parent.comments_child }}
+                             {{ comments_child.content }}
                         </div>
                     </div>
                         {% endif %}
@@ -93,7 +94,7 @@
 {#                    {{ comments_parent }}#}
                     <from class="reply_form fl">
                         <textarea class="reply_input"></textarea>
-                        <input type="submit" name="" value="回复" class="reply_sub fr">
+                        <input type="submit" name="" value="回复" class="reply_sub fr"  parent_id="{{ comments_parent.id }}" news_id="{{ comments_parent.news_id }}">
                         <input type="reset" name="" value="取消" class="reply_cancel fr">
                     </from>
                 </div>
