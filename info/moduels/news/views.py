@@ -148,6 +148,10 @@ def news_details(news_id):
         if news in user.collection_news:
             is_collection = True
 
+    # 判断当前的用户是否被关注
+
+
+
     # 查询当前新闻的所有的评论
 
     comments = []
@@ -158,14 +162,17 @@ def news_details(news_id):
 
     comments_parent_list = []
     comments_child_list = []
+    comments_list = []
     # print(comments[0].to_dict())
-    for comment in comments:
-        if comment.to_dict()["parent"]:
-            """这样就是父类的评论"""
-            comments_child_list.append(comment.to_dict())
-        else:
-            comments_parent_list.append(comment.to_dict())
+    # for comment in comments:
+    #     if comment.to_dict()["parent"]:
+    #         """这样就是父类的评论"""
+    #         comments_child_list.append(comment.to_dict())
+    #     else:
+    #         comments_parent_list.append(comment.to_dict())
 
+    for comment in comments:
+        comments_list.append(comment.to_dict())
     # print(comments_parent_list)
     # print(comments_child_list)
         # comments_list.append(comment.to_dict())
@@ -180,7 +187,9 @@ def news_details(news_id):
         'news_list': news_list,
         "is_collection": is_collection,
         'comments_parent_list': comments_parent_list,
-        'comments_child_list': comments_child_list
+        'comments_child_list': comments_child_list,
+        'comments_list': comments_list,
+
 
     }
 
