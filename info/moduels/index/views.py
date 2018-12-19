@@ -73,26 +73,22 @@ def index():
     """主页的右侧的排行"""
     # 数据库查询排行之后的数据，只取出配置中显示个数的值
     news_list = []
-    news_rank_info = None
     try:
         news_rank_info = News.query.order_by(News.clicks.desc()).limit(constants.CLICK_RANK_MAX_NEWS).all()
-    except Exception as e:
-        current_app.logger.error(e)
-
-    if news_rank_info:
         for news_info in news_rank_info:
             news_list.append(news_info.to_review_dict())
+    except Exception as e:
+        current_app.logger.error(e)
 
     # 获取当前导航
     nav_info_list = []
     try:
         nav_list = Category.query.all()  # 查询出所有的导航栏
-    except Exception as e:
-        current_app.logger.error(e)
-    if nav_list:
         for nav in nav_list:
             nav_info_list.append(nav.to_dict())
-            # print(nav.to_dict())
+    except Exception as e:
+        current_app.logger.error(e)
+        # print(nav.to_dict())
 
     # print(nav_info_list)
 

@@ -7,7 +7,7 @@ from info.models import User
 from info.utils.response_code import RET
 from . import passport_blue
 from info import redis_store, constants, db
-from flask import request, abort, make_response, current_app, jsonify, session, redirect, url_for
+from flask import request, abort, make_response, current_app, jsonify, session
 from info.utils.captcha.captcha import captcha
 
 
@@ -62,6 +62,7 @@ def login():
     session["user_id"] = user.id
     session["moblie"] = user.mobile
     session["nick_name"] = user.nick_name
+    session.permanent = True  # 设置session的过期时间为自己设置的选项
 
     return jsonify(errno=RET.OK, errmsg="OK")
 
@@ -120,6 +121,7 @@ def register():
     session["user_id"] = user.id
     session["moblie"] = mobile
     session["nick_name"] = user.nick_name
+    session.permanent = True  # 设置session的过期时间为自己设置的选项
 
     return jsonify(errno=RET.OK, errmsg="OK")
 

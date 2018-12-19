@@ -54,6 +54,8 @@ def create_app(config_name):
     #  设置Session保存的位置
     Session(app)
 
+
+
     # 给app添加自定义过滤器
     from info.utils.common import rank_class
     app.add_template_filter(rank_class)
