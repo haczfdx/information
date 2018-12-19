@@ -171,10 +171,10 @@
 {#                    static/news/images/headImage/a36a08a65f1234e5774a13a755e84db0.jpg#}
 
                     {% endif %}"></a>
-            <a href="#" class="author_name">{{ data.user_dict.nick_name }}</a>
-            <div class="author_resume">{{ data.user_dict.signature }}</div>
-            <div class="writings"><span>总篇数</span><b>{{ data.user_dict.news_count }}</b></div>
-            <div class="follows"><span>粉丝</span><b>{{ data.user_dict.followers_count }}</b></div>
+            <a href="#" class="author_name">{{ data.news_data.author.nick_name}}</a>
+            <div class="author_resume">{{ data.news_data.author.signature }}</div>
+            <div class="writings"><span>总篇数</span><b>{{ data.news_data.author.news_count }}</b></div>
+            <div class="follows"><span>粉丝</span><b>{{ data.news_data.author.followers_count }}</b></div>
             <a href="javascript:;" class="focus fr">关注</a>
             <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
         </div>

@@ -167,7 +167,7 @@ def news_details(news_id):
             comments_parent_list.append(comment.to_dict())
 
     # print(comments_parent_list)
-    print(comments_child_list)
+    # print(comments_child_list)
         # comments_list.append(comment.to_dict())
 
     # 新闻的点击次数加一
