@@ -33,10 +33,7 @@
              <a href="javascript:;" class="collection block-center" news_id="{{ data.news_data.id }}">收藏</a>
         {% endif %}
 
-
-        <div class="comment_form_logout">
-            登录发表你的评论
-        </div>
+         {% if data.user_dict %}
 
         <form action="" class="comment_form">
             <div class="person_pic">
@@ -45,6 +42,13 @@
             <textarea placeholder="请发表您的评论" class="comment_input"></textarea>
             <input type="submit" name="" value="评 论" class="comment_sub">
         </form>
+
+         {% else %}
+              <div class="comment_form_logout">
+            登录发表你的评论
+        </div>
+        {% endif %}
+
 
 
         <div class="comment_count">
@@ -138,13 +142,22 @@
 {% endblock %}
 
 {% block author %}
-    <div class="author_card">
-        <a href="#" class="author_pic"><img src="../../static/news/images/user_pic.png" alt="author_pic"></a>
-        <a href="#" class="author_name">张大山</a>
-        <div class="author_resume">张大山的简介,张大山</div>
-        <div class="writings"><span>总篇数</span><b>23</b></div>
-        <div class="follows"><span>粉丝</span><b>36</b></div>
+    {% if data.user_dict %}
+         <div class="author_card">
+        <a href="#" class="author_pic"><img src="{% if data.user_dict.avatar_url == None %}
+                    ../../static/news/images/person01.png
+                    {% else %}
+                    ../../static/news/images/headImage/{{ data.user_dict.this_avatar_url }}
+{#                    static/news/images/headImage/a36a08a65f1234e5774a13a755e84db0.jpg#}
+
+                    {% endif %}"></a>
+        <a href="#" class="author_name">{{ data.user_dict.nick_name }}</a>
+        <div class="author_resume">{{ data.user_dict.signature }}</div>
+        <div class="writings"><span>总篇数</span><b>{{ data.user_dict.news_count }}</b></div>
+        <div class="follows"><span>粉丝</span><b>{{ data.user_dict.followers_count }}</b></div>
         <a href="javascript:;" class="focus fr">关注</a>
         <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
     </div>
+    {% endif %}
+
 {% endblock %}

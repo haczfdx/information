@@ -1,7 +1,7 @@
 from flask import request, jsonify, current_app, render_template, abort, session, g
 from info import constants, db
 from info.models import Category, News, User
-from info.utils.common import user_login_status
+from info.utils.common import user_login_status, commit
 from info.utils.response_code import RET
 from . import news_blue
 
@@ -49,14 +49,7 @@ def news_collect():
         else:
             return jsonify(errno=RET.DBERR, errmsg="移除失败, remove失败")
 
-    # 手动提交数据
-    try:
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(e)
-        return jsonify(errno=RET.OK, errmsg="数据提交错误")
-
+    commit()
 
     return jsonify(errno=RET.OK, errmsg="ok")
 
@@ -101,8 +94,22 @@ def news_details(news_id):
         if news in user.collection_news:
             is_collection = True
 
+
+    # 查询当前新闻的所有的评论
+    try:
+        comments = news.comments.all()
+
+    except Exception as e:
+        current_app.logger.error(e)
+
+
+
+    # 新闻的点击次数加一
+    news.clicks += 1
+    commit(json=False)
+
     data = {
-        'user_dict': user.to_admin_dict() if user else None,
+        'user_dict': user.to_dict() if user else None,
         'news_data': news.to_dict() if news else None,
         'news_list': news_list,
         "is_collection": is_collection

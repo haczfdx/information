@@ -1,9 +1,11 @@
 """定义一个自定义的工具扩展"""
 import functools
 
-from flask import session, current_app, g
+from flask import session, current_app, g, jsonify, abort
 
+from info import db
 from info.models import User
+from info.utils.response_code import RET
 
 
 def rank_class(index):
@@ -35,3 +37,16 @@ def user_login_status(f):
         g.user = user
         return f(*args, **kwargs)
     return wapper
+
+
+def commit(json=True, status=404):
+    # 手动提交数据
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        if json:
+            return jsonify(errno=RET.OK, errmsg="数据提交错误")
+        else:
+            abort(status)
