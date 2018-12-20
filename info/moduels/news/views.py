@@ -6,6 +6,63 @@ from info.utils.response_code import RET
 from . import news_blue
 
 
+@news_blue.route("/comment_like", methods=["POST"])
+@user_login_status
+def comment_like():
+    user = g.user
+    if not user:
+        return jsonify(errno=RET.LOGINERR, errmsg="你还没有登录")
+
+    user_id = request.json.get("user_id")
+    comment_id = request.json.get("comment_id")
+    is_like = request.json.get("is_like")
+
+    print(user_id)
+    print(comment_id)
+    print(is_like)
+
+    if not all([user_id, comment_id]):
+        current_app.logger.error("非法参数")
+        return jsonify(errno=RET.DATAERR, errmsg="非法参数")
+
+    if user.id != user_id:
+        current_app.logger.error("非法操作")
+        return jsonify(errno=RET.DATAERR, errmsg="非法操作")
+
+    # 查询出对应的评论
+    comment = None
+    try:
+        comment = Comment.query.filter(comment_id==Comment.id).first()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="非法查询数据")
+
+
+    # 进行用户与点赞之间的关联
+    try:
+        commentliket = CommentLike()
+        commentliket.user_id = user_id
+        commentliket.comment_id = comment_id
+        db.session.add(commentliket)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="数据添加出错")
+
+    # 给点赞添加次数
+    comment += 1
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="点赞修改出错")
+
+
+    return jsonify(errno=RET.OK, errmsg="OK")
+
+
 @news_blue.route("/news_comment_add", methods=["POST"])
 @user_login_status
 def news_comment_add():
@@ -160,7 +217,7 @@ def news_details(news_id):
         if user:
             if (user.id == comment.user_id) and \
                     (CommentLike.query.filter(CommentLike.comment_id == comment.id,
-                                             CommentLike.user_id == comment.user_id).first()):
+                                              CommentLike.user_id == comment.user_id).first()):
                 is_commentlike = True
 
         comment_dict["is_commentlike"] = is_commentlike

@@ -124,7 +124,7 @@ $(function () {
                         comments.content +
                         '</div>' +
                         '<div class="comment_time fl">' + comments.create_time + '</div>' +
-                        '<a news_id="'+comments.user.id+'" comment_id="'+comments.id+'" href="javascript:;" class="comment_up has_comment_up fr">' + comments.like_count + '</a>' +
+                        '<a user_id="'+comments.user.id+'" comment_id="'+comments.id+'" href="javascript:;" class="comment_up has_comment_up fr">' + comments.like_count + '</a>' +
                         '<a href="javascript:;" class="comment_reply fr">回复</a>' +
                         '<from class="reply_form fl">' +
                         '<textarea class="reply_input"></textarea>' +
@@ -173,29 +173,63 @@ $(function () {
             var $this = $(this);
             if (sHandler.indexOf('has_comment_up') >= 0) {
                 // 如果当前该评论已经是点赞状态，再次点击会进行到此代码块内，代表要取消点赞
-                $this.removeClass('has_comment_up')
+
                 // alert("取消点赞")
-            } else {
-                $this.addClass('has_comment_up')
-                // alert("点赞")
-                var comment_id = $this.comment_id
-                var user_id = $this.user_id
-                var param = {
+               var comment_id = $this.attr('comment_id')
+                var user_id = $this.attr('user_id')
+                var params = {
                     'comment_id':comment_id,
-                    'user_id': user_id
+                    'user_id': user_id,
+                    'is_like': false
                 }
                 $.ajax({
-                    url: "",
+                    url: "/news/comment_like",
                     type: "POST",
                     contentType: "application/json",
-                    headers:{"X-CSRFToken": getCookie("csrf-token")},
-                    data: JSON.stringify(param),
+                    headers:{"X-CSRFToken": getCookie("csrf_token")},
+                    data: JSON.stringify(params),
                     success: function (response) {
                         if(response.errno==0){
                             // 成功
-                            $(".comment_up").val($(".comment_up").val()+1)
+                             $this.removeClass('has_comment_up')
+                            $this.html(Number($this.html())-1)
+                        }else if (response.errno == 4102) {
+                            $('.login_form_con').show()
                         }else {
                             // 失败
+                            alert(response.errmsg)
+                        }
+
+                    }
+                })
+
+            } else {
+
+                // alert("点赞")
+                var comment_id = $this.attr('comment_id')
+                var user_id = $this.attr('user_id')
+
+                var params = {
+                    'comment_id':comment_id,
+                    'user_id': user_id,
+                    'is_like': true
+                }
+                $.ajax({
+                    url: "/news/comment_like",
+                    type: "POST",
+                    contentType: "application/json",
+                    headers:{"X-CSRFToken": getCookie("csrf_token")},
+                    data: JSON.stringify(params),
+                    success: function (response) {
+                        if(response.errno==0){
+                            // 成功
+                            $this.addClass('has_comment_up')
+                            $this.html(Number($this.html())+1)
+                        }else if (response.errno == 4102) {
+                            $('.login_form_con').show()
+                        }else {
+                            // 失败
+                             alert(response.errmsg)
                         }
 
                     }
@@ -253,8 +287,8 @@ $(function () {
                                     '</div>'+
                                 '</div>'+
                             '<div class="comment_time fl">' + comments.create_time + '</div>' +
-                            '<a href="javascript:;" class="comment_up has_comment_up fr">' + comments.like_count + '</a>' +
-                            '<a href="javascript:;" class="comment_reply fr">回复</a>' +
+                            '<a user_id="'+comments.user.id+'" comment_id="'+comments.id+'"  href="javascript:;" class="comment_up has_comment_up fr">' + comments.like_count + '</a>' +
+                            '<a  href="javascript:;" class="comment_reply fr">回复</a>' +
                             '<from class="reply_form fl">' +
                             '<textarea class="reply_input"></textarea>' +
                             '<input type="submit" name="" value="回复" class="reply_sub fr" parent_id="' + comments.id + '"' +
