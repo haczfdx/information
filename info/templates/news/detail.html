@@ -54,7 +54,7 @@
             {{ data.news_data.comments_count }}条评论
         </div>
         {% for comments in data.comments_list %}
-            {% if not comments.parent %}
+{#            {% if not comments.parent %}#}
                 <div class="comment_list_con">
                     <div class="comment_list">
                         <div class="person_pic fl">
@@ -72,18 +72,20 @@
                         <div class="comment_text fl">
                             {{ comments.content }}
                         </div>
-                        {% for comments_child in data.comments_list %}
+{#                        {% for comments_child in data.comments_list %}#}
                             {#                        {{ comments_child }}#}
-                            {% if comments_child.parent.id == comments.id %}
+{#                            {% if comments_child.parent.id == comments.id %}#}
+                            {% if comments.parent %}
+{#                                {{ comments.parent }}#}
                                 <div class="reply_text_con fl">
-                                    <div class="user_name2">{{ comments_child.user.nick_name }}</div>
+                                    <div class="user_name2">@{{ comments.parent.user.nick_name }}</div>
                                     <div class="reply_text">
-                                        {{ comments_child.content }}
+                                        {{ comments.parent.content }}
                                     </div>
                                 </div>
                             {% endif %}
 
-                        {% endfor %}
+{#                        {% endfor %}#}
 
 
                         <div class="comment_time fl">{{ comments.create_time }}</div>
@@ -98,7 +100,7 @@
                         </from>
                     </div>
                 </div>
-            {% endif %}
+{#            {% endif %}#}
 
 
         {% endfor %}
@@ -128,9 +130,17 @@
         <div class="author_resume">{{ data.news_data.author.signature }}</div>
         <div class="writings"><span>总篇数</span><b>{{ data.news_data.author.news_count }}</b></div>
         <div class="follows"><span>粉丝</span><b>{{ data.news_data.author.followers_count }}</b></div>
-        <a href="javascript:;" class="focus fr">关注</a>
+
+        {% if not data.is_followered %}
+            {% if data.user_dict.id != data.news_data.author.id %}
+        <a href="javascript:;" class="focus fr" news_user_id="{{ data.news_data.author.id }}">关注</a>
+                   <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
+                {% endif %}
+            {% else %}
+            <a href="javascript:;" class="focus fr" news_user_id="{{ data.news_data.author.id }}" display:>关注</a>
         <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
+        {% endif %}
     </div>
-    {#    {% endif %}#}
+
 
 {% endblock %}

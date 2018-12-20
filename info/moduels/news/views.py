@@ -142,14 +142,6 @@ def news_details(news_id):
         for news_info in news_rank_info:
             news_list.append(news_info.to_review_dict())
 
-    # 判断新闻是否被收藏
-    is_collection = False
-    if user:
-        if news in user.collection_news:
-            is_collection = True
-
-    # 判断当前的用户是否被关注
-
     # 查询当前新闻的所有的评论
 
     comments = []
@@ -163,6 +155,24 @@ def news_details(news_id):
     for comment in comments:
         comments_list.append(comment.to_dict())
 
+
+    # 判断新闻是否被收藏
+    is_collection = False
+    if user:
+        if news in user.collection_news:
+            is_collection = True
+
+
+    # 判断当前的用户是否被关注
+    is_followered = False
+    if user:
+        if news:
+            if news.to_dict()["author"]:
+                print(news.to_dict()["author"]['id'])
+                if news.to_dict()["author"]["id"] in user.followers:
+                    is_followered = True
+
+
     # 新闻的点击次数加一
     news.clicks += 1
     commit(json=False)
@@ -173,7 +183,7 @@ def news_details(news_id):
         'news_list': news_list,
         "is_collection": is_collection,
         'comments_list': comments_list,
-
+        'is_followered': is_followered,
     }
 
     return render_template("news/detail.html", data=data)

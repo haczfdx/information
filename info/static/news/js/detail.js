@@ -178,6 +178,24 @@ $(function () {
     // 关注当前新闻作者
     $(".focus").click(function () {
 
+        var news_user_id = $(this).attr("news_user_id")
+        // alert(news_user_id)
+        var param={
+            'news_user_id': news_user_id
+        }
+        $.ajax({
+            url:"news/follower_user",
+            type:"post",
+            data:JSON.stringify(param),
+            headers:{
+                'X-CSRFToken': getCookie('csrf-token')
+            },
+            success: function (response) {
+
+
+            }
+
+        })
     })
 
     // 取消关注当前新闻作者
