@@ -164,6 +164,8 @@ class Comment(BaseModel, db.Model):
     parent = db.relationship("Comment", remote_side=[id])  # 自关联
     like_count = db.Column(db.Integer, default=0)  # 点赞条数
 
+    comments = db.relationship("CommentLike", lazy="dynamic")
+
     def to_dict(self):
         resp_dict = {
             "id": self.id,

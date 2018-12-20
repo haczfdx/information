@@ -25,8 +25,8 @@ def news_comment_add():
     comment_text = request.json.get("comment_text")
     parent_id = request.json.get("parent_id")
 
-    print(news_id)
-    print(comment_text)
+    # print(news_id)
+    # print(comment_text)
     # 校验参数
     if not all([news_id, comment_text]):
         current_app.logger.error("非法参数")
@@ -40,7 +40,7 @@ def news_comment_add():
     try:
         news = News.query.filter(News.id == news_id).first()
         if not news:
-            return jsonify(errno=RET.NODATA, errmsg="收藏出错，没有这个新闻")
+            return jsonify(errno=RET.NODATA, errmsg="评论错误，没有这个新闻")
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="数据库链接错误")
@@ -58,12 +58,13 @@ def news_comment_add():
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="数据库提交出错")
 
-    return jsonify(errno=RET.OK, errmsg="OK")
+    return jsonify(errno=RET.OK, errmsg="OK", data=comment.to_dict())
 
 
 @news_blue.route("/news_collect", methods=["POST"])
 @user_login_status
 def news_collect():
+
     """
     1. 获取POST数据
     2. 校验数据

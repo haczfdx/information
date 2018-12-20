@@ -25,11 +25,14 @@
         {{ data.news_data.content | safe }}
 
         {% if data.is_collection %}
+              <a style="display: none" href="javascript:;" class="collection block-center" news_id="{{ data.news_data.id }}">收藏</a>
             <a href="javascript:;" class="collected block-center" news_id="{{ data.news_data.id }}"><span class="out">已收藏</span><span
                     class="over">取消收藏</span></a>
 
         {% else %}
             <a href="javascript:;" class="collection block-center" news_id="{{ data.news_data.id }}">收藏</a>
+              <a style="display: none" href="javascript:;" class="collected block-center" news_id="{{ data.news_data.id }}"><span class="out">已收藏</span><span
+                    class="over">取消收藏</span></a>
         {% endif %}
 
         {% if data.user_dict %}
@@ -53,18 +56,16 @@
         <div class="comment_count">
             {{ data.news_data.comments_count }}条评论
         </div>
+
+      <div class="comment_list_con">
         {% for comments in data.comments_list %}
-{#            {% if not comments.parent %}#}
-                <div class="comment_list_con">
+
                     <div class="comment_list">
                         <div class="person_pic fl">
                             <img src="{% if data.user_dict.avatar_url == None %}
                     ../../static/news/images/worm.jpg
                     {% else %}
                     ../../static/news/images/headImage/{{ comments.user.this_avatar_url }}
-
-{#                    static/news/images/headImage/a36a08a65f1234e5774a13a755e84db0.jpg#}
-
                     {% endif %}" alt="用户图标">
 
                         </div>
@@ -72,11 +73,7 @@
                         <div class="comment_text fl">
                             {{ comments.content }}
                         </div>
-{#                        {% for comments_child in data.comments_list %}#}
-                            {#                        {{ comments_child }}#}
-{#                            {% if comments_child.parent.id == comments.id %}#}
                             {% if comments.parent %}
-{#                                {{ comments.parent }}#}
                                 <div class="reply_text_con fl">
                                     <div class="user_name2">@{{ comments.parent.user.nick_name }}</div>
                                     <div class="reply_text">
@@ -85,13 +82,9 @@
                                 </div>
                             {% endif %}
 
-{#                        {% endfor %}#}
-
-
                         <div class="comment_time fl">{{ comments.create_time }}</div>
                         <a href="javascript:;" class="comment_up has_comment_up fr">{{ comments.like_count }}</a>
-                        <a href="javascript:;" class="comment_reply fr">回复</a>
-                        {#                    {{ comments }}#}
+                          <a href="javascript:;" class="comment_reply fr">回复</a>
                         <from class="reply_form fl">
                             <textarea class="reply_input"></textarea>
                             <input type="submit" name="" value="回复" class="reply_sub fr" parent_id="{{ comments.id }}"
@@ -99,13 +92,13 @@
                             <input type="reset" name="" value="取消" class="reply_cancel fr">
                         </from>
                     </div>
-                </div>
-{#            {% endif %}#}
+
+
 
 
         {% endfor %}
 
-
+    </div>
     </div>
 
 
@@ -134,10 +127,10 @@
         {% if not data.is_followered %}
             {% if data.user_dict.id != data.news_data.author.id %}
         <a href="javascript:;" class="focus fr" news_user_id="{{ data.news_data.author.id }}">关注</a>
-                   <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
+                   <a  style="display:none" href="javascript:;" class="focused fr"><span class="out" >已关注</span><span class="over">取消关注</span></a>
                 {% endif %}
             {% else %}
-            <a href="javascript:;" class="focus fr" news_user_id="{{ data.news_data.author.id }}" display:>关注</a>
+            <a href="javascript:;" class="focus fr" news_user_id="{{ data.news_data.author.id }}" style="display: none">关注</a>
         <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
         {% endif %}
     </div>
