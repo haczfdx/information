@@ -1,6 +1,6 @@
 from flask import request, jsonify, current_app, render_template, abort, session, g
 from info import constants, db
-from info.models import Category, News, User, Comment
+from info.models import Category, News, User, Comment, CommentLike
 from info.utils.common import user_login_status, commit
 from info.utils.response_code import RET
 from . import news_blue
@@ -64,7 +64,6 @@ def news_comment_add():
 @news_blue.route("/news_collect", methods=["POST"])
 @user_login_status
 def news_collect():
-
     """
     1. 获取POST数据
     2. 校验数据
@@ -154,8 +153,19 @@ def news_details(news_id):
     comments_list = []
 
     for comment in comments:
-        comments_list.append(comment.to_dict())
+        comment_dict = comment.to_dict()
+        # 判断当前用户是否点赞这个评论
+        is_commentlike = False
+        # 取出当前用户所有的点赞
+        if user:
+            if (user.id == comment.user_id) and \
+                    (CommentLike.query.filter(CommentLike.comment_id == comment.id,
+                                             CommentLike.user_id == comment.user_id).first()):
+                is_commentlike = True
 
+        comment_dict["is_commentlike"] = is_commentlike
+
+        comments_list.append(comment_dict)
 
     # 判断新闻是否被收藏
     is_collection = False
@@ -163,16 +173,14 @@ def news_details(news_id):
         if news in user.collection_news:
             is_collection = True
 
-
     # 判断当前的用户是否被关注
     is_followered = False
     if user:
         if news:
             if news.to_dict()["author"]:
-                print(news.to_dict()["author"]['id'])
+                # print(news.to_dict()["author"]['id'])
                 if news.to_dict()["author"]["id"] in user.followers:
                     is_followered = True
-
 
     # 新闻的点击次数加一
     news.clicks += 1
@@ -185,6 +193,7 @@ def news_details(news_id):
         "is_collection": is_collection,
         'comments_list': comments_list,
         'is_followered': is_followered,
+        'is_commentlike': is_commentlike
     }
 
     return render_template("news/detail.html", data=data)

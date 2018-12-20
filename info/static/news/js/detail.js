@@ -87,6 +87,7 @@ $(function () {
     $(".comment_form").submit(function (e) {
         var comment_text = $(".comment_input").val()
         var news_id = $(".comment_form").attr("news_id")
+
         var params = {
             'comment_text': comment_text,
             'news_id': news_id
@@ -105,6 +106,7 @@ $(function () {
                     // location.reload()
                     console.log(response.data)
                     var comments = response.data
+
                     if (comments.user.this_avatar_url) {
                         var avatar_url = '../../static/news/images/headImage/' + comments.user.this_avatar_url
                     } else {
@@ -112,7 +114,7 @@ $(function () {
                     }
 
 
-                    var new_comment = '<div class="comment_list_con">' +
+                    var new_comment =
                         '<div class="comment_list">' +
                         '<div class="person_pic fl">' +
                         '<img src="' + avatar_url + '" alt="用户图标">' +
@@ -121,16 +123,8 @@ $(function () {
                         '<div class="comment_text fl">' +
                         comments.content +
                         '</div>' +
-                        // '{% if comments.parent %}'+
-                        //     '<div class="reply_text_con fl">'+
-                        //         '<div class="user_name2">@{{ comments.parent.user.nick_name }}</div>'+
-                        //         '<div class="reply_text">'+
-                        //             '{{ comments.parent.content }}'+
-                        //         '</div>'+
-                        //     '</div>'+
-                        // '{% endif %}'+
                         '<div class="comment_time fl">' + comments.create_time + '</div>' +
-                        '<a href="javascript:;" class="comment_up has_comment_up fr">' + comments.like_count + '</a>' +
+                        '<a news_id="'+comments.user.id+'" comment_id="'+comments.id+'" href="javascript:;" class="comment_up has_comment_up fr">' + comments.like_count + '</a>' +
                         '<a href="javascript:;" class="comment_reply fr">回复</a>' +
                         '<from class="reply_form fl">' +
                         '<textarea class="reply_input"></textarea>' +
@@ -138,13 +132,18 @@ $(function () {
                         'news_id="' + comments.news_id + '">' +
                         '<input type="reset" name="" value="取消" class="reply_cancel fr">' +
                         '</from>' +
-                        '</div>' +
                         '</div>'
 
 
-                    // $(".comment_count").after(new_comment)
-                    $(".comment_list_con").prepend(new_comment)
+                    // alert(new_comment_1)
 
+
+                    // $(".comment_count").after(new_comment)
+
+                    $(".comment_list_con").prepend(new_comment)
+                        $(".comment_input").val("")
+                    // alert("1232")
+                    UpNumComment()
 
                 } else if (response.errno == 4102) {
                     $('.login_form_con').show()
@@ -175,8 +174,32 @@ $(function () {
             if (sHandler.indexOf('has_comment_up') >= 0) {
                 // 如果当前该评论已经是点赞状态，再次点击会进行到此代码块内，代表要取消点赞
                 $this.removeClass('has_comment_up')
+                // alert("取消点赞")
             } else {
                 $this.addClass('has_comment_up')
+                // alert("点赞")
+                var comment_id = $this.comment_id
+                var user_id = $this.user_id
+                var param = {
+                    'comment_id':comment_id,
+                    'user_id': user_id
+                }
+                $.ajax({
+                    url: "",
+                    type: "POST",
+                    contentType: "application/json",
+                    headers:{"X-CSRFToken": getCookie("csrf-token")},
+                    data: JSON.stringify(param),
+                    success: function (response) {
+                        if(response.errno==0){
+                            // 成功
+                            $(".comment_up").val($(".comment_up").val()+1)
+                        }else {
+                            // 失败
+                        }
+
+                    }
+                })
             }
         }
 
@@ -214,7 +237,7 @@ $(function () {
                         }
 
 
-                        var new_comment = '<div class="comment_list_con">' +
+                        var new_comment =
                             '<div class="comment_list">' +
                             '<div class="person_pic fl">' +
                             '<img src="' + avatar_url + '" alt="用户图标">' +
@@ -238,16 +261,17 @@ $(function () {
                             'news_id="' + comments.news_id + '">' +
                             '<input type="reset" name="" value="取消" class="reply_cancel fr">' +
                             '</from>' +
-                            '</div>' +
                             '</div>'
 
-                        $this.prev().val("")
-                        $this.parent().hide()
+
 
                         // $(".comment_count").after(new_comment)
                         $(".comment_list_con").prepend(new_comment)
 
-
+                        $this.prev().val("")
+                        $this.parent().hide()
+                        // alert(2134)
+                        UpNumComment()
 
                     } else if (response.errno == 4102) {
                         $('.login_form_con').show()
@@ -289,3 +313,9 @@ $(function () {
 
     })
 })
+
+function UpNumComment() {
+     var count = $(".comment_list").length
+    $(".comment_count").html(count+"条评论")
+    $(".detail_about .comment").html(count)
+}
