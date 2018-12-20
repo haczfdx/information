@@ -110,22 +110,27 @@
 {% endblock %}
 
 {% block author %}
-    {% if data.user_dict %}
-        <div class="author_card">
-            <a href="#" class="author_pic"><img src="{% if data.user_dict.avatar_url == None %}
+
+    <div class="author_card">
+        <a href="#" class="author_pic"><img src="{% if data.news_data.author==None %}
                     ../../static/news/images/person01.png
                     {% else %}
-                    ../../static/news/images/headImage/{{ data.user_dict.this_avatar_url }}
+                    {% if data.news_data.author.this_avatar_url==None %}
+                               ../../static/news/images/worm.jpg
+                    {% else %}
+                                ../../static/news/images/headImage/{{ data.news_data.author.this_avatar_url }}
+                    {% endif %}
+
 {#                    static/news/images/headImage/a36a08a65f1234e5774a13a755e84db0.jpg#}
 
                     {% endif %}"></a>
-            <a href="#" class="author_name">{{ data.news_data.author.nick_name }}</a>
-            <div class="author_resume">{{ data.news_data.author.signature }}</div>
-            <div class="writings"><span>总篇数</span><b>{{ data.news_data.author.news_count }}</b></div>
-            <div class="follows"><span>粉丝</span><b>{{ data.news_data.author.followers_count }}</b></div>
-            <a href="javascript:;" class="focus fr">关注</a>
-            <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
-        </div>
-    {% endif %}
+        <a href="#" class="author_name">{{ data.news_data.author.nick_name }}</a>
+        <div class="author_resume">{{ data.news_data.author.signature }}</div>
+        <div class="writings"><span>总篇数</span><b>{{ data.news_data.author.news_count }}</b></div>
+        <div class="follows"><span>粉丝</span><b>{{ data.news_data.author.followers_count }}</b></div>
+        <a href="javascript:;" class="focus fr">关注</a>
+        <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
+    </div>
+    {#    {% endif %}#}
 
 {% endblock %}
