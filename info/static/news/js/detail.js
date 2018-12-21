@@ -124,7 +124,7 @@ $(function () {
                         comments.content +
                         '</div>' +
                         '<div class="comment_time fl">' + comments.create_time + '</div>' +
-                        '<a user_id="'+comments.user.id+'" comment_id="'+comments.id+'" href="javascript:;" class="comment_up has_comment_up fr">' + comments.like_count + '</a>' +
+                        '<a news_id="'+comments.news_id+'" comment_id="'+comments.id+'" href="javascript:;" class="comment_up has_comment_up fr">' + comments.like_count + '</a>' +
                         '<a href="javascript:;" class="comment_reply fr">回复</a>' +
                         '<from class="reply_form fl">' +
                         '<textarea class="reply_input"></textarea>' +
@@ -287,7 +287,7 @@ $(function () {
                                     '</div>'+
                                 '</div>'+
                             '<div class="comment_time fl">' + comments.create_time + '</div>' +
-                            '<a user_id="'+comments.user.id+'" comment_id="'+comments.id+'"  href="javascript:;" class="comment_up has_comment_up fr">' + comments.like_count + '</a>' +
+                            '<a news_id="'+comments.news_id+'" comment_id="'+comments.id+'"  href="javascript:;" class="comment_up has_comment_up fr">' + comments.like_count + '</a>' +
                             '<a  href="javascript:;" class="comment_reply fr">回复</a>' +
                             '<from class="reply_form fl">' +
                             '<textarea class="reply_input"></textarea>' +

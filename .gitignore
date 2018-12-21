@@ -2,6 +2,7 @@
 logs/log*
 migrations
 待优化
+image_storage.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

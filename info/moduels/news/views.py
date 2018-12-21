@@ -9,56 +9,85 @@ from . import news_blue
 @news_blue.route("/comment_like", methods=["POST"])
 @user_login_status
 def comment_like():
+    """
+    用户点赞的后端处理逻辑
+    1. 获取用户数据
+    2. 获取传送过来的数据
+    3. 校验参数
+    4. 处理数据
+    :return:
+    """
     user = g.user
     if not user:
         return jsonify(errno=RET.LOGINERR, errmsg="你还没有登录")
 
-    user_id = request.json.get("user_id")
+    # 获取参数
+    # news_id = request.json.get("user_id")
     comment_id = request.json.get("comment_id")
     is_like = request.json.get("is_like")
 
-    print(user_id)
-    print(comment_id)
-    print(is_like)
-
-    if not all([user_id, comment_id]):
+    try:
+        # news_id = int(news_id)
+        comment_id = int(comment_id)
+    except Exception as e:
         current_app.logger.error("非法参数")
         return jsonify(errno=RET.DATAERR, errmsg="非法参数")
 
-    if user.id != user_id:
-        current_app.logger.error("非法操作")
-        return jsonify(errno=RET.DATAERR, errmsg="非法操作")
+    # print(user_id)
+    # print(comment_id)
+    # print(is_like)
+
+    # if not all([news_id, comment_id]):
+    #     current_app.logger.error("非法参数")
+    #     return jsonify(errno=RET.DATAERR, errmsg="非法参数")
+
+    # print(user.id)
+    # print(user_id)
+    # if user.id != user_id:
+    #     current_app.logger.error("非法操作")
+    #     return jsonify(errno=RET.DATAERR, errmsg="非法操作")
 
     # 查询出对应的评论
     comment = None
     try:
-        comment = Comment.query.filter(comment_id==Comment.id).first()
+        comment = Comment.query.filter(comment_id == Comment.id).first()
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="非法查询数据")
 
+    # 前面的所有信息校验成功，下面开始操作点赞和取消点赞的操作
+    if is_like:
+        # 进行用户与点赞之间的关联
+        try:
+            commentliket = CommentLike()
+            commentliket.user_id = user.id
+            commentliket.comment_id = comment_id
+            db.session.add(commentliket)
+            db.session.commit()
+            comment.like_count += 1
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(e)
+            return jsonify(errno=RET.DBERR, errmsg="数据添加出错")
+    else:
+        try:
+            CommentLike.query.filter(CommentLike.comment_id == comment_id,
+                                     CommentLike.user_id == user.id).delete()
+            comment.like_count -= 1
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(errno=RET.DBERR, errmsg="数据删除出错")
+    #  计算点赞的数量
 
-    # 进行用户与点赞之间的关联
-    try:
-        commentliket = CommentLike()
-        commentliket.user_id = user_id
-        commentliket.comment_id = comment_id
-        db.session.add(commentliket)
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR, errmsg="数据添加出错")
 
-    # 给点赞添加次数
-    comment += 1
     try:
+        # comment.like_count = CommentLike.query.filter(CommentLike.comment_id == comment_id).count()
         db.session.commit()
+
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="点赞修改出错")
-
 
     return jsonify(errno=RET.OK, errmsg="OK")
 
@@ -215,9 +244,11 @@ def news_details(news_id):
         is_commentlike = False
         # 取出当前用户所有的点赞
         if user:
-            if (user.id == comment.user_id) and \
-                    (CommentLike.query.filter(CommentLike.comment_id == comment.id,
-                                              CommentLike.user_id == comment.user_id).first()):
+            # if (user.id == comment.user_id) and \
+            #         (CommentLike.query.filter(CommentLike.comment_id == comment.id,
+            #                                   CommentLike.user_id == user.user_id).first()):
+            if user and CommentLike.query.filter(CommentLike.comment_id == comment.id,
+                                                 CommentLike.user_id == user.id).first():
                 is_commentlike = True
 
         comment_dict["is_commentlike"] = is_commentlike
