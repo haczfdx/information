@@ -50,6 +50,7 @@ def user_pic_info():
         return render_template("news/user_pic_info.html", data=data)
 
 
+
 @user_blue.route("/user_base_info", methods=["GET", 'POST'])
 @user_login_status
 def user_base_info():
