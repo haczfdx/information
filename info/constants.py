@@ -7,6 +7,10 @@ SMS_CODE_REDIS_EXPIRES = 300
 # 七牛空间域名
 QINIU_DOMIN_PREFIX = "http://pjnp10v6z.bkt.clouddn.com/"
 
+
+# 用户头像最大上传大小
+USER_AVATAR_SIZE = 1024 * 1024 * 1
+
 # 首页展示最多的新闻数量
 HOME_PAGE_MAX_NEWS = 10
 

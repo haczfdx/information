@@ -43,8 +43,10 @@ $(function () {
                     $('#nick_name', parent.document).html(param['nick_name'])
                     $('.input_sub').blur()
                   }else if (response.errno == 4102) {
+                      alert("12313")
                       $('.login_form_con', parent.document).show()
                   }else {
+                       alert("12313")
                       // 失败
                       alert(response.errmsg)
                   }

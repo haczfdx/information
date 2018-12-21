@@ -37,7 +37,7 @@
                 <img src="{% if data.user_dict.avatar_url == None %}
                     ../../static/news/images/person01.png
                     {% else %}
-                    ../../static/news/images/headImage/{{ data.user_dict.this_avatar_url }}
+                    {{ data.user_dict.avatar_url }}
 {#                    static/news/images/headImage/a36a08a65f1234e5774a13a755e84db0.jpg#}
 
                     {% endif %}" class="lgin_pic">
