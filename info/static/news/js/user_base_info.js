@@ -6,7 +6,7 @@ function getCookie(name) {
 $(function () {
 
     $(".base_info").submit(function (e) {
-        e.preventDefault()
+        e.preventDefault();
 
         var signature = $("#signature").val()
         var nick_name = $("#nick_name").val()
@@ -20,7 +20,37 @@ $(function () {
             alert('请选择性别')
         }
 
-        // TODO 修改用户信息接口
+        //  修改用户信息接口
+          var param = {
+            "signature":signature,
+              "nick_name":nick_name,
+              "gender": gender
+          }
+          $.ajax({
+              url: "",
+              type: "POST",
+              contentType: "application/json",
+              headers:{"X-CSRFToken": getCookie("csrf_token")},
+              data: JSON.stringify(param),
+              success: function (response) {
+                  if(response.errno==0){
+                      // 成功
+                      // $(".user_center_name").html(nick_name)
+                      // $("#nick_name").html(nick_name)
+                      //
+                      // location.reload()
+                    $('.user_center_name', parent.document).html(param['nick_name'])
+                    $('#nick_name', parent.document).html(param['nick_name'])
+                    $('.input_sub').blur()
+                  }else if (response.errno == 4102) {
+                      $('.login_form_con', parent.document).show()
+                  }else {
+                      // 失败
+                      alert(response.errmsg)
+                  }
+
+              }
+          })
 
     })
 })

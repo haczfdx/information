@@ -13,7 +13,11 @@
         <h3>头像设置</h3>
         <div class="form-group">
             <label class="label01">当前图像：</label>
-            <img src="../../static/news/images/user_pic.png" alt="用户图片" class="now_user_pic">
+            <img src="{% if data.user_dict.avatar_url == None %}
+                    ../../static/news/images/person01.png
+                    {% else %}
+                    ../../static/news/images/headImage/{{ data.user_dict.this_avatar_url }}
+                    {% endif %}" alt="用户图片" class="now_user_pic">
         </div>
         <div class="form-group">
             <label>上传图像：</label>

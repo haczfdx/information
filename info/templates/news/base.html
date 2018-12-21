@@ -42,7 +42,7 @@
 
                     {% endif %}" class="lgin_pic">
                 {#                {{ data.user_dict }}#}
-                <a href="{% if data.user_dict %} {{ url_for("user.index") }} {% endif %}">{{ data.user_dict.nick_name }}</a>
+                <a id="nick_name" href="{% if data.user_dict %} {{ url_for("user.index") }} {% endif %}">{{ data.user_dict.nick_name }}</a>
                 <a href="javascript:;" onclick="logout()">退出</a>
             </div>
         {% endif %}
