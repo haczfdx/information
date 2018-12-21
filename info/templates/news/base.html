@@ -42,7 +42,7 @@
 
                     {% endif %}" class="lgin_pic">
                 {#                {{ data.user_dict }}#}
-                <a href="#">{{ data.user_dict.nick_name }}</a>
+                <a href="{% if data.user_dict %} {{ url_for("user.index") }} {% endif %}">{{ data.user_dict.nick_name }}</a>
                 <a href="javascript:;" onclick="logout()">退出</a>
             </div>
         {% endif %}
@@ -57,10 +57,13 @@
 
     {% endblock %}
 
+   {% block news_rank %}
     <div class="rank_con fr">
         {% block author %}
 
         {% endblock %}
+
+
         <div class="rank_title">
             <h3>点击排行</h3>
         </div>
@@ -85,7 +88,10 @@
 
 
     </div>
+
+        {% endblock %}
 </div>
+{% block footer %}
 <div class="footer">
     <div class="footer_links">
         <a href="">关于我们</a>
@@ -101,6 +107,8 @@
         电话：010-****888 京ICP备*******8号
     </p>
 </div>
+{% endblock %}
+
 
 <!-- 登录表单 -->
 <form class="login_form_con">

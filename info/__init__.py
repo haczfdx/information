@@ -1,7 +1,7 @@
 from logging.handlers import RotatingFileHandler
 import logging
 import redis
-from flask import Flask
+from flask import Flask, g, render_template
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
@@ -34,6 +34,15 @@ def create_app(config_name):
     redis_store = redis.StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT,
                                     decode_responses=True)
 
+    from info.utils.common import user_login_status
+    @app.errorhandler(404)
+    @user_login_status
+    def page_not_found(e):
+        data = {
+            "user_dict": g.user.to_dict() if g.user else None
+        }
+        return render_template("news/404.html", data=data)
+
     # 开启CSRF保护
     CSRFProtect(app)
     """
@@ -54,8 +63,6 @@ def create_app(config_name):
     #  设置Session保存的位置
     Session(app)
 
-
-
     # 给app添加自定义过滤器
     from info.utils.common import rank_class
     app.add_template_filter(rank_class)
@@ -72,6 +79,10 @@ def create_app(config_name):
     # 新闻相关的路由注册
     from info.moduels.news import news_blue
     app.register_blueprint(news_blue, url_prefix="/news")
+
+    # 用户登录页面相关的路由注册
+    from info.moduels.user import user_blue
+    app.register_blueprint(user_blue, url_prefix="/user")
 
     return app
 
