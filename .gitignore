@@ -3,6 +3,7 @@ logs/log*
 migrations
 待优化
 image_storage.py
+*qiniu*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -239,10 +239,11 @@ def news_details(news_id):
 
     comments_list = []
 
+    # 判断当前用户是否点赞这个评论
+    is_commentlike = False
     for comment in comments:
         comment_dict = comment.to_dict()
-        # 判断当前用户是否点赞这个评论
-        is_commentlike = False
+
         # 取出当前用户所有的点赞
         if user:
             # if (user.id == comment.user_id) and \

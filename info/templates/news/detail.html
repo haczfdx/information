@@ -65,7 +65,7 @@
                             <img src="{% if data.user_dict.avatar_url == None %}
                     ../../static/news/images/worm.jpg
                     {% else %}
-                    ../../static/news/images/headImage/{{ comments.user.this_avatar_url }}
+                    {{ comments.user.avatar_url }}
                     {% endif %}" alt="用户图标">
 
                         </div>
@@ -114,7 +114,7 @@
                     {% if data.news_data.author.this_avatar_url==None %}
                                ../../static/news/images/worm.jpg
                     {% else %}
-                                ../../static/news/images/headImage/{{ data.news_data.author.this_avatar_url }}
+                               {{ data.news_data.author.avatar_url }}
                     {% endif %}
 
 {#                    static/news/images/headImage/a36a08a65f1234e5774a13a755e84db0.jpg#}

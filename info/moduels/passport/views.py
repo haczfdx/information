@@ -62,7 +62,7 @@ def login():
     session["user_id"] = user.id
     session["moblie"] = user.mobile
     session["nick_name"] = user.nick_name
-    # session.permanent = True  # 设置session的过期时间为自己设置的选项
+    session.permanent = False  # 设置session的过期时间为自己设置的选项
 
     return jsonify(errno=RET.OK, errmsg="OK")
 

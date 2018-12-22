@@ -1,4 +1,4 @@
-from flask import render_template, g, request, jsonify, current_app, redirect, url_for
+from flask import render_template, g, request, jsonify, current_app, redirect, url_for, abort
 from werkzeug.datastructures import FileStorage
 
 from info import db
@@ -7,9 +7,6 @@ from info.moduels.user import user_blue
 from info.utils.common import user_login_status
 from info.utils.image_storage import storage
 from info.utils.response_code import RET
-
-
-
 
 
 @user_blue.route("/user_news_release", methods=["GET", 'POST'])
@@ -30,16 +27,68 @@ def user_follow():
     return render_template("news/user_follow.html")
 
 
-@user_blue.route("/user_collection", methods=["GET", 'POST'])
+@user_blue.route("/user_collection")
 @user_login_status
 def user_collection():
-    return render_template("news/user_collection.html")
+    """
+    用户的收藏页面
+    1. 获取参数
+        - 当前页
+    2. 返回数据
+        - 当前页
+        - 总页数
+        - 每页的数据
+    :return:
+    """
+    user = g.user
+    if not user:
+        return jsonify(errno=RET.LOGINERR, errmsg="你还没有登录")
 
+    # 获取当前页
+    page = request.args.get('p', 1)
+    page_show = constants.USER_COLLECTION_MAX_NEWS
+
+    # 校验参数
+    try:
+        page = int(page)
+    except Exception as e:
+        current_app.logger.error(e)
+        # return jsonify(errno=RET.PARAMERR, errmsg="参数错误")
+        abort(404)
+
+    try:
+        user_collection = user.collection_news.paginate(page, 3)
+        currentPage = user_collection.page
+        totalPage = user_collection.pages
+        items = user_collection.items
+    except Exception as e:
+        current_app.logger.error(e)
+        # return jsonify(errno=RET.DBERR, errmsg="数据库查询出错")
+        abort(404)
+
+    user_collection_list = []
+    for item in items:
+        user_collection_list.append(item.to_review_dict())
+
+
+
+
+
+    data = {
+        'currentPage': currentPage,
+        'totalPage': totalPage,
+        'user_collection_list': user_collection_list
+    }
+    return render_template("news/user_collection.html", data=data)
 
 
 @user_blue.route("/user_pass_info", methods=["GET", 'POST'])
 @user_login_status
 def user_pass_info():
+    """
+    修改密码
+    :return:
+    """
     user = g.user
     if not user:
         return jsonify(errno=RET.LOGINERR, errmsg="你还没有登录")
@@ -61,7 +110,7 @@ def user_pass_info():
     if new_pwd1 != new_pwd2:
         return jsonify(errno=RET.PARAMERR, errmsg="两次密码输入不相同")
 
-    if len(new_pwd1)<6:
+    if len(new_pwd1) < 6:
         return jsonify(errno=RET.PARAMERR, errmsg="密码不可以小于6位")
 
     if not user.check_passoword(old_pwd):
@@ -75,9 +124,6 @@ def user_pass_info():
         return jsonify(errno=RET.DBERR, errmsg="操作数据库出错")
 
     return jsonify(errno=RET.OK, errmsg="OK")
-
-
-
 
 
 @user_blue.route("/user_pic_info", methods=["GET", 'POST'])
@@ -117,8 +163,8 @@ def user_pic_info():
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="操作数据库出错")
 
-    data= {
-        'avatar_url': constants.QINIU_DOMIN_PREFIX+file_key
+    data = {
+        'avatar_url': constants.QINIU_DOMIN_PREFIX + file_key
     }
     return jsonify(errno=RET.OK, errmsg="OK", data=data)
 

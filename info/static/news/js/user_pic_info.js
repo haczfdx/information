@@ -23,6 +23,7 @@ $(function () {
                     $(".user_center_pic img", parent.document).attr("src", response.data.avatar_url)
                 }else {
                     // 失败
+                    alert("上传失败")
                 }
             }
         })
