@@ -212,6 +212,8 @@ def news_details(news_id):
         news = News.query.filter(News.id == news_id).first()
         if not news:
             abort(404)
+        if news.status != 0:
+            abort(404)
     except Exception as e:
         current_app.logger.error(e)
         abort(404)

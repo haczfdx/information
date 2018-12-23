@@ -3,28 +3,154 @@ from werkzeug.datastructures import FileStorage
 
 from info import db
 from info import constants
+from info.models import Category, News
 from info.moduels.user import user_blue
 from info.utils.common import user_login_status
 from info.utils.image_storage import storage
 from info.utils.response_code import RET
 
 
-@user_blue.route("/user_news_release", methods=["GET", 'POST'])
-@user_login_status
-def user_news_release():
-    return render_template("news/user_news_release.html")
-
-
-@user_blue.route("/user_news_list", methods=["GET", 'POST'])
-@user_login_status
-def user_news_list():
-    return render_template("news/user_news_list.html")
-
 
 @user_blue.route("/user_follow", methods=["GET", 'POST'])
 @user_login_status
 def user_follow():
     return render_template("news/user_follow.html")
+
+
+
+
+@user_blue.route("/user_news_list")
+@user_login_status
+def user_news_list():
+    """
+    发布的新闻列表
+
+    :return:
+    """
+    if not g.user:
+        return "请登录"
+    # 获取参数
+    page = request.args.get("p", 1)
+
+    # 判断参数
+    try:
+        page = int(page)
+    except Exception as e:
+        current_app.logger.error(e)
+        page = 1
+
+    user = g.user
+    # 初始化参数
+    news_list = []
+    current_page = 1
+    total_page = 1
+    try:
+        paginate = News.query.filter(News.user_id == user.id).paginate(page, constants.USER_COLLECTION_MAX_NEWS, False)
+        news_list = paginate.items
+        current_page = paginate.page
+        total_page = paginate.pages
+    except Exception as e:
+        current_app.logger.error(e)
+
+    news_dict_list = []
+    for news in news_list:
+        news_dict_list.append(news.to_review_dict())
+
+    data = {
+        "news_dict_list": news_dict_list,
+        "total_page": total_page,
+        "current_page": current_page,
+    }
+    return render_template("news/user_news_list.html", data=data)
+
+
+
+@user_blue.route("/user_news_release", methods=["GET", 'POST'])
+@user_login_status
+def user_news_release():
+    if request.method == "GET":
+        try:
+            categorys = Category.query.filter(Category.name != "最新").all()
+        except Exception as e:
+            current_app.logger.error(e)
+            abort(404)
+
+        category_list = []
+        for category in categorys:
+            category_list.append(category.to_dict())
+
+        data = {
+            "category_list": category_list,
+        }
+        return render_template("news/user_news_release.html", data=data)
+
+    user = g.user
+    if not user:
+        return jsonify(errno=RET.LOGINERR, errmsg="请登录")
+
+    # 标题
+    title = request.form.get("title")
+    # 新闻来源
+    source = "个人发布"
+    # 摘要
+    digest = request.form.get("digest")
+    # 新闻内容
+    content = request.form.get("content")
+    # 索引图片
+    index_image = request.files.get("index_image")
+    # 分类id
+    category_id = request.form.get("category_id")
+
+    print(title)
+    print(digest)
+    print(content)
+    print(index_image)
+    print(category_id)
+
+    # 不可以为空
+    if not all([title, source, digest, content, index_image, category_id]):
+        return jsonify(errno=RET.PARAMERR, errmsg="参数有误")
+
+    # 对传过来的参数进行转换成int类型
+    try:
+        category_id = int(category_id)
+        if category_id == 0:
+            return jsonify(errno=RET.PARAMERR, errmsg="参数有误")
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.PARAMERR, errmsg="参数有误")
+
+    # 取到图片，将图片上传到七牛云
+    try:
+        index_image_data = index_image.read()
+        # 上传到七牛云
+        key = storage(index_image_data)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.PARAMERR, errmsg="参数有误")
+
+    # 新闻表添加数据
+    news = News()
+    news.title = title
+    news.digest = digest
+    news.source = source
+    news.content = content
+    news.index_image_url = constants.QINIU_DOMIN_PREFIX + key
+    news.category_id = category_id
+    news.user_id = g.user.id
+    # 审核状态
+    news.status = 1
+
+
+    try:
+        db.session.add(news)
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        return jsonify(errno=RET.DBERR, errmsg="数据保存失败")
+
+    return jsonify(errno=RET.OK, errmsg="OK")
 
 
 @user_blue.route("/user_collection")
@@ -42,7 +168,7 @@ def user_collection():
     """
     user = g.user
     if not user:
-        return jsonify(errno=RET.LOGINERR, errmsg="你还没有登录")
+        return "请先登录"
 
     # 获取当前页
     page = request.args.get('p', 1)
@@ -57,7 +183,7 @@ def user_collection():
         abort(404)
 
     try:
-        user_collection = user.collection_news.paginate(page, 3)
+        user_collection = user.collection_news.paginate(page, page_show)
         currentPage = user_collection.page
         totalPage = user_collection.pages
         items = user_collection.items
@@ -69,10 +195,6 @@ def user_collection():
     user_collection_list = []
     for item in items:
         user_collection_list.append(item.to_review_dict())
-
-
-
-
 
     data = {
         'currentPage': currentPage,
@@ -89,15 +211,12 @@ def user_pass_info():
     修改密码
     :return:
     """
+    if request.method == "GET":
+        return render_template("news/user_pass_info.html")
+
     user = g.user
     if not user:
-        return jsonify(errno=RET.LOGINERR, errmsg="你还没有登录")
-
-    if request.method == "GET":
-        data = {
-            "user_dict": user.to_dict() if user else None
-        }
-        return render_template("news/user_pass_info.html", data=data)
+        return jsonify(errno=RET.LOGINERR, errmsg="密码错误")
 
     old_pwd = request.json.get("old_pwd")
     new_pwd1 = request.json.get("new_pwd1")
@@ -129,20 +248,19 @@ def user_pass_info():
 @user_blue.route("/user_pic_info", methods=["GET", 'POST'])
 @user_login_status
 def user_pic_info():
-    user = g.user
-    if not user:
-        return jsonify(errno=RET.LOGINERR, errmsg="你还没有登录")
-
     if request.method == "GET":
         data = {
-            "user_dict": user.to_dict() if user else None
+            "user_dict": g.user.to_dict() if g.user else None
         }
         return render_template("news/user_pic_info.html", data=data)
 
+    user = g.user
+    if not user:
+        return jsonify(errno=RET.LOGINERR, errmsg="密码错误")
     # 获取参数
     try:
         file = request.files.get("avatar").read()  # type:FileStorage
-        print(len(file))
+        # print(len(file))
         if len(file) > constants.USER_AVATAR_SIZE:
             return jsonify(errno=RET.PARAMERR, errmsg="不可以上传大于1M的图片")
     except Exception as e:
@@ -177,15 +295,20 @@ def user_base_info():
     post进行数据处理
     :return:
     """
-    user = g.user
-    if not user:
-        return jsonify(errno=RET.LOGINERR, errmsg="你还没有登录")
 
     if request.method == "GET":
+        user = g.user
+        if not user:
+            return "请先登录"
+
         data = {
             "user_dict": user.to_dict() if user else None
         }
         return render_template("news/user_base_info.html", data=data)
+
+    user = g.user
+    if not user:
+        return jsonify(errno=RET.LOGINERR, errmsg="请登录")
 
     signature = request.json.get("signature")
     nick_name = request.json.get("nick_name")

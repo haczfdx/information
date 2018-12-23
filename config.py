@@ -25,10 +25,11 @@ class Config(object):
     # session的配置
     SESSION_TYPE = 'redis'  # 指定session保存到redis中
     SESSION_USE_SIGNER = True  # 让cookie中的session_id被加密处理
+    SESSION_REDIS = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)  # 使用 redis 的实例
     SESSION_PERMANENT = False
     # SESSION_REDIS = redis.StrictRedis(port=REDIS_PORT, host=REDIS_HOST)  # 设置为redis实例
-    SESSION_REDIS = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)  # 使用 redis 的实例
-    PERMANM_SESSION_LIFETIME = 86400  # 设置有效期，单位是秒
+
+    PERMANENT_SESSION_LIFETIME = 86400 * 2  # 设置有效期，单位是秒
 
     """日志相关的配置"""
     # 日志的级别

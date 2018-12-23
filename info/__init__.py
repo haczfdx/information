@@ -43,14 +43,17 @@ def create_app(config_name):
         }
         return render_template("news/404.html", data=data)
 
+    """
+       CSRFProtect(app) 会自动判断header中的X-CSRFToken的值与cookie中的csrf_token的值是否相等不相等不提交
+       csrf保护，需要取出表单的csrftoken的值和cookie中的值进行校验
+       表单中的csrftoken可以使用X-CSRFToken的header进行保存
+       cookie中的csrftoken可以每一次请求前进行设置
+       """
     # 开启CSRF保护
     CSRFProtect(app)
-    """
-    CSRFProtect(app) 会自动判断header中的X-CSRFToken的值与cookie中的csrf_token的值是否相等不相等不提交
-    csrf保护，需要取出表单的csrftoken的值和cookie中的值进行校验
-    表单中的csrftoken可以使用X-CSRFToken的header进行保存
-    cookie中的csrftoken可以每一次请求前进行设置
-    """
+
+    #  设置Session保存的位置
+    Session(app)
 
     @app.after_request
     def after_request(response):
@@ -59,9 +62,6 @@ def create_app(config_name):
         # 设置cookie中的csrf的值
         response.set_cookie("csrf_token", csrf_token)
         return response
-
-    #  设置Session保存的位置
-    Session(app)
 
     # 给app添加自定义过滤器
     from info.utils.common import rank_class
@@ -83,6 +83,11 @@ def create_app(config_name):
     # 用户登录页面相关的路由注册
     from info.moduels.user import user_blue
     app.register_blueprint(user_blue, url_prefix="/user")
+
+    # 管理员页面的路由
+    from info.moduels.admin import admin_blue
+    app.register_blueprint(admin_blue, url_prefix="/admin")
+
 
     return app
 

@@ -39,8 +39,9 @@ def news_list():
     if class_id != 1:
         # 如果不是查询最新的那么就要append查询参数，参数参数为列表，可以在filter中前面加*解包
         query_list.append(News.category_id == class_id)
+        # query_list.append(News.status == 0)
     try:
-        paginate = News.query.filter(*query_list).order_by(News.create_time.desc()).paginate(page, per_page)
+        paginate = News.query.filter(*query_list, News.status == 0).order_by(News.create_time.desc()).paginate(page, per_page)
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR, errmsg="数据库查询错误")
