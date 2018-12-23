@@ -9,7 +9,8 @@ class Config(object):
     # 配置一些app的基础的设置
     ENV = ""
     DEBUG = True
-    SECRET_KEY = b64encode(os.urandom(64))
+    #SECRET_KEY = b64encode(os.urandom(64)) 不可以设置随机的，这样会报错
+    SECRET_KEY = "EjpNVSNQTyGi1VvWECj9TvC/+kq3oujee2kTfQUs8yCM6xX9Yjq52v54g+HVoknA"
 
     """配置一些数据库的信息"""
     # MySQL数据库配置
@@ -27,9 +28,8 @@ class Config(object):
     SESSION_USE_SIGNER = True  # 让cookie中的session_id被加密处理
     SESSION_REDIS = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)  # 使用 redis 的实例
     SESSION_PERMANENT = False
-    # SESSION_REDIS = redis.StrictRedis(port=REDIS_PORT, host=REDIS_HOST)  # 设置为redis实例
-
     PERMANENT_SESSION_LIFETIME = 86400 * 2  # 设置有效期，单位是秒
+
 
     """日志相关的配置"""
     # 日志的级别

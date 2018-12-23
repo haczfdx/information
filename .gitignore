@@ -4,6 +4,7 @@ migrations
 待优化
 image_storage.py
 *qiniu*
+test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

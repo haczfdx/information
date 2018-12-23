@@ -34,14 +34,7 @@ def create_app(config_name):
     redis_store = redis.StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT,
                                     decode_responses=True)
 
-    from info.utils.common import user_login_status
-    @app.errorhandler(404)
-    @user_login_status
-    def page_not_found(e):
-        data = {
-            "user_dict": g.user.to_dict() if g.user else None
-        }
-        return render_template("news/404.html", data=data)
+
 
     """
        CSRFProtect(app) 会自动判断header中的X-CSRFToken的值与cookie中的csrf_token的值是否相等不相等不提交
@@ -54,6 +47,15 @@ def create_app(config_name):
 
     #  设置Session保存的位置
     Session(app)
+
+    from info.utils.common import user_login_status
+    @app.errorhandler(404)
+    @user_login_status
+    def page_not_found(e):
+        data = {
+            "user_dict": g.user.to_dict() if g.user else None
+        }
+        return render_template("news/404.html", data=data)
 
     @app.after_request
     def after_request(response):

@@ -11,6 +11,9 @@ $(function () {
 
         // 发布完毕之后需要选中我的发布新闻
         $(this).ajaxSubmit({
+            // :function(request){
+            //
+            // }
             url: "/user/user_news_release",
             type: "POST",
             headers: {
