@@ -322,19 +322,30 @@ $(function () {
     // 关注当前新闻作者
     $(".focus").click(function () {
 
-        var news_user_id = $(this).attr("news_user_id")
+        var user_id = $(this).attr("user_id")
         // alert(news_user_id)
-        var param = {
-            'news_user_id': news_user_id
+        var params = {
+            'user_id': user_id,
+            'action': "follow"
         }
         $.ajax({
-            url: "news/follower_user",
+            url: "/news/follower_user",
             type: "post",
-            data: JSON.stringify(param),
+            contentType: "application/json",
+            data: JSON.stringify(params),
+
             headers: {
-                'X-CSRFToken': getCookie('csrf-token')
+                'X-CSRFToken': getCookie('csrf_token')
             },
             success: function (response) {
+                if(response.errno==0){
+                     $(".focus").hide()
+                    $(".focused").show()
+                     $(".follows b").html(Number($(".follows b").html())+1)
+
+                }else {
+                    alert(response.errmsg)
+                }
 
 
             }
@@ -344,7 +355,35 @@ $(function () {
 
     // 取消关注当前新闻作者
     $(".focused").click(function () {
+ var user_id = $(this).attr("user_id")
+        // alert(news_user_id)
+        var params = {
+            'user_id': user_id,
+            'action': "unfollow"
+        }
+        $.ajax({
+            url: "/news/follower_user",
+            type: "post",
+            data: JSON.stringify(params),
+            contentType: "application/json",
+            headers: {
+                'X-CSRFToken': getCookie('csrf_token')
+            },
+            success: function (response) {
+                if(response.errno==0){
+                     $(".focused").hide()
+                     $(".focus").show()
+                         $(".follows b").html(Number($(".follows b").html())-1)
 
+
+                }else {
+                    alert(response.errmsg)
+                }
+
+
+            }
+
+        })
     })
 })
 

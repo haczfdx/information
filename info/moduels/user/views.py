@@ -3,7 +3,7 @@ from werkzeug.datastructures import FileStorage
 
 from info import db
 from info import constants
-from info.models import Category, News
+from info.models import Category, News, User
 from info.moduels.user import user_blue
 from info.utils.common import user_login_status
 from info.utils.image_storage import storage
@@ -11,12 +11,65 @@ from info.utils.response_code import RET
 
 
 
-@user_blue.route("/user_follow", methods=["GET", 'POST'])
+@user_blue.route("/other_info", methods=["GET", 'POST'])
+@user_login_status
+def other_info():
+    if request.method == "GET":
+        return render_template("news/other.html")
+
+
+
+@user_blue.route("/user_follow")
 @user_login_status
 def user_follow():
-    return render_template("news/user_follow.html")
+    """
+    用户列表中的已关注的用户列表
+    1. 使用GET的方式去获取数据
+    2. 使用paginate来进行查询分页
+        获取当前页所有用户对象
+        获取当前页
+        获取总页数
+    3. 返回数据渲渲渲染模板
+    :return:
+    """
 
+    # 获取页数
+    p = request.args.get("p", 1)
+    try:
+        p = int(p)
+    except Exception as e:
+        current_app.logger.error(e)
+        p = 1
 
+    # 取到当前登录用户
+    user = g.user
+
+    follower_users = []
+    current_page = 1
+    total_page = 1
+    try:
+        paginate = user.followed.paginate(p, constants.USER_FOLLOWED_MAX_COUNT, False)
+        # 获取当前页数据
+        follower_users = paginate.items
+        # 获取当前页
+        current_page = paginate.page
+        # 获取总页数
+        total_page = paginate.pages
+    except Exception as e:
+        current_app.logger.error(e)
+
+    follower_users_list = []
+
+    for follow_user in follower_users:
+        follower_users_list.append(follow_user.to_dict())
+
+    data = {
+        "follower_users_list": follower_users_list,
+        "total_page": total_page,
+        "current_page": current_page
+    }
+
+    return render_template('news/user_follow.html', data=data)
 
 
 @user_blue.route("/user_news_list")
@@ -62,7 +115,6 @@ def user_news_list():
         "current_page": current_page,
     }
     return render_template("news/user_news_list.html", data=data)
-
 
 
 @user_blue.route("/user_news_release", methods=["GET", 'POST'])
@@ -140,7 +192,6 @@ def user_news_release():
     news.user_id = g.user.id
     # 审核状态
     news.status = 1
-
 
     try:
         db.session.add(news)

@@ -6,6 +6,75 @@ from info.utils.response_code import RET
 from . import news_blue
 
 
+@news_blue.route("/follower_user", methods=["POST"])
+@user_login_status
+def follower_user():
+    """
+    用户的关注处理
+    POST 数据修改 返回JSON数据前端局部刷新
+    1. 获取参数
+        - user_id 关注的对象
+        - action 是关注还是取消关注
+    2. 校验参数
+        - 必须登录
+        - 必须都不为空
+        - 必须user_id可以查询出数据
+    3. 修改操作
+    4. 返回结果
+    :return:
+    """
+    # 必须是登录状态
+    user = g.user
+    if not user:
+        return jsonify(errno=RET.LOGINERR, errmsg="用户未登录")
+
+    # 获取参数
+    # print(request.json)
+    follower_user_id = request.json.get("user_id")
+    action = request.json.get("action")
+
+    # 校验参数
+    if not all([follower_user_id, action]):
+        return jsonify(errno=RET.PARAMERR, errmsg="参数错误")
+
+    if action not in ("follow", "unfollow"):
+        return jsonify(errno=RET.PARAMERR, errmsg="参数错误")
+
+    #  查询用户是否存在
+    try:
+        news_user = User.query.get(follower_user_id)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg="数据查询错误")
+
+    if not news_user:
+        return jsonify(errno=RET.NODATA, errmsg="未查询到数据")
+
+    #  根据要执行的操作去修改对应的数据
+    if action == "follow":
+        if news_user not in user.followed:
+            # 添加关注
+            user.followed.append(news_user)
+        else:
+            return jsonify(errno=RET.DATAEXIST, errmsg="当前用户已被关注")
+    else:
+        # 取消关注
+        if news_user in user.followed:
+            user.followed.remove(news_user)
+        else:
+            return jsonify(errno=RET.DATAEXIST, errmsg="当前用户未被关注")
+
+    # 数据库提交
+    try:
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        return jsonify(errno=RET.DBERR, errmsg="数据库错误")
+
+    return jsonify(errno=RET.OK, errmsg="OK")
+
+
 @news_blue.route("/comment_like", methods=["POST"])
 @user_login_status
 def comment_like():
@@ -78,7 +147,6 @@ def comment_like():
             current_app.logger.error(e)
             return jsonify(errno=RET.DBERR, errmsg="数据删除出错")
     #  计算点赞的数量
-
 
     try:
         # comment.like_count = CommentLike.query.filter(CommentLike.comment_id == comment_id).count()
@@ -267,12 +335,11 @@ def news_details(news_id):
 
     # 判断当前的用户是否被关注
     is_followered = False
-    if user:
-        if news:
-            if news.to_dict()["author"]:
-                # print(news.to_dict()["author"]['id'])
-                if news.to_dict()["author"]["id"] in user.followers:
-                    is_followered = True
+
+    if news.user and user:
+        # if user 是否关注过 news.user
+        if news.user in user.followed:
+            is_followered = True
 
     # 新闻的点击次数加一
     news.clicks += 1
