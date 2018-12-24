@@ -90,7 +90,8 @@ class User(BaseModel, db.Model):
             "mobile": self.mobile,
             "register": self.create_time.strftime("%Y-%m-%d %H:%M:%S"),
             "last_login": self.last_login.strftime("%Y-%m-%d %H:%M:%S"),
-            "avatar_url": self.avatar_url
+            "avatar_url": self.avatar_url,
+            "create_time": self.create_time
         }
         return resp_dict
 

@@ -33,16 +33,17 @@
                         <td class="tleft">{{ news_dict.title }}</td>
                         <td>{{ news_dict.create_time }}</td>
                         <td>
+{#                        {{ news_dict }}#}
                             {% if news_dict.status==0 %}
                             已通过
-                            {% elif news_dict.status==1 %}
+                            {% elif news_dict.status== 1 %}
                             审核中
                             {% else %}
                             未通过
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{{ url_for("admin.news_review_detail") }}" class="review">审核</a>
+                            <a href="{{ url_for("admin.news_review_detail", news_id=news_dict.id) }}" class="review">审核</a>
                         </td>
 
 
