@@ -106,3 +106,35 @@
 {% endblock %}
 
 {% block author %}
+
+    <div class="author_card">
+        <a href="#" class="author_pic"><img src="{% if data.news_data.author==None %}
+                    ../../static/news/images/person01.png
+                    {% else %}
+                    {% if data.news_data.author.this_avatar_url==None %}
+                               ../../static/news/images/worm.jpg
+                    {% else %}
+                               {{ data.news_data.author.avatar_url }}
+                    {% endif %}
+
+{#                    static/news/images/headImage/a36a08a65f1234e5774a13a755e84db0.jpg#}
+
+                    {% endif %}"></a>
+        <a href="#" class="author_name">{{ data.news_data.author.nick_name }}</a>
+        <div class="author_resume">{{ data.news_data.author.signature }}</div>
+        <div class="writings"><span>总篇数</span><b>{{ data.news_data.author.news_count }}</b></div>
+        <div class="follows"><span>粉丝</span><b>{{ data.news_data.author.followers_count }}</b></div>
+
+        {% if not data.is_followered %}
+            {% if data.user_dict.id != data.news_data.author.id %}
+        <a href="javascript:;" class="focus fr" user_id="{{ data.news_data.author.id }}">关注</a>
+                   <a style="display:none" href="javascript:;" class="focused fr" user_id="{{ data.news_data.author.id }}"><span class="out" >已关注</span><span class="over">取消关注</span></a>
+                {% endif %}
+            {% else %}
+            <a href="javascript:;" class="focus fr" user_id="{{ data.news_data.author.id }}" style="display: none">关注</a>
+        <a href="javascript:;" class="focused fr" user_id="{{ data.news_data.author.id }}"><span class="out">已关注</span><span class="over">取消关注</span></a>
+        {% endif %}
+    </div>
+
+
+{% endblock %}
