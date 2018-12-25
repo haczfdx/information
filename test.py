@@ -26,7 +26,6 @@ def add_test_users():
     print('OK')
 
 
-
 add_test_users()
 #
 #
