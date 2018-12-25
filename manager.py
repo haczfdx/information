@@ -25,8 +25,6 @@ def createsuperuser(name, password):
     if not all([name, password]):
         print("参数不足")
 
-
-
     user = User()
     user.nick_name = name
     user.mobile = name

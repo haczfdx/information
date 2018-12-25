@@ -10,7 +10,7 @@ def storage(data):
         q = Auth(access_key, secret_key)
         token = q.upload_token(bucket_name)
         ret, info = put_data(token, None, data)
-        print(ret, info)
+        # print(ret, info)
     except Exception as e:
         raise e
 

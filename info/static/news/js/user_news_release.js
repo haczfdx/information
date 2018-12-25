@@ -27,11 +27,11 @@ $(function () {
             },
             success: function (resp) {
                 if (resp.errno == "0") {
-                    // 选中索引为6的左边单菜单
-                    // window.parent.fnChangeMenu(6)
-                    // // 滚动到顶部
-                    // window.parent.scrollTo(0, 0)
-                    alert("OK")
+                    选中索引为6的左边单菜单
+                    window.parent.fnChangeMenu(6)
+                    // 滚动到顶部
+                    window.parent.scrollTo(0, 0)
+                    alert("发布成功")
                 }else {
                     alert(resp.errmsg)
                 }

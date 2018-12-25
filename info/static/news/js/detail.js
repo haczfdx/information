@@ -108,7 +108,7 @@ $(function () {
                     var comments = response.data
 
                     if (comments.user.this_avatar_url) {
-                        var avatar_url = '../../static/news/images/headImage/' + comments.user.this_avatar_url
+                        var avatar_url =  comments.user.avatar_url
                     } else {
                         var avatar_url = '../../static/news/images/worm.jpg'
                     }
@@ -265,7 +265,7 @@ $(function () {
                         // location.reload()
                         var comments = response.data
                         if (comments.user.this_avatar_url) {
-                            var avatar_url = '../../static/news/images/headImage/' + comments.user.this_avatar_url
+                            var avatar_url = comments.user.avatar_url
                         } else {
                             var avatar_url = '../../static/news/images/worm.jpg'
                         }

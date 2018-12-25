@@ -27,7 +27,7 @@
             <div class="author_resume">{{ follower_users.signature }}</div>
             <div class="writings"><span>总篇数</span><b>{{ follower_users.news_count }}</b></div>
             <div class="follows"><span>粉丝</span><b>{{ follower_users.followers_count }}</b></div>
-            <a href="javascript:;" class="focused fr" data-userid="{{ follower_users.id }}"><span class="out">已关注</span><span
+            <a href="javascript:;" class="focused fr" user_id="{{ follower_users.id }}"><span class="out">已关注</span><span
                     class="over">取消关注</span></a>
         </li>
     {% endfor %}
