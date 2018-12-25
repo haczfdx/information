@@ -25,6 +25,8 @@ def add_test_users():
         db.session.commit()
     print('OK')
 
+
+
 add_test_users()
 #
 #
